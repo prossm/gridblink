@@ -9,12 +9,11 @@ export const createPost = async () => {
   return await reddit.submitCustomPost({
     splash: {
       // Splash Screen Configuration
-      appDisplayName: 'gridblink',
+      appDisplayName: 'Gridblink',
       backgroundUri: 'default-splash.png',
-      buttonLabel: 'Tap to Start',
-      description: 'An exciting interactive experience',
-      entryUri: 'index.html',
-      heading: 'Welcome to the Game!',
+      buttonLabel: 'Play Now',
+      description: 'Test your memory with this musical pattern game!',
+      heading: 'Gridblink',
       appIconUri: 'default-icon.png',
     },
     postData: {
@@ -22,6 +21,6 @@ export const createPost = async () => {
       score: 0,
     },
     subredditName: subredditName,
-    title: 'gridblink',
+    title: 'Gridblink - Memory & Music Game',
   });
 };

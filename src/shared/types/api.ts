@@ -16,3 +16,22 @@ export type DecrementResponse = {
   postId: string;
   count: number;
 };
+
+export type LeaderboardEntry = {
+  username: string;
+  score: number;
+  timestamp: number;
+};
+
+export type LeaderboardResponse = {
+  entries: LeaderboardEntry[];
+};
+
+export type SubmitScoreRequest = {
+  score: number;
+};
+
+export type SubmitScoreResponse = {
+  success: boolean;
+  rank?: number;
+};

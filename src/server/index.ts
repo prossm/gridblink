@@ -1,5 +1,13 @@
 import express from 'express';
-import { InitResponse, IncrementResponse, DecrementResponse } from '../shared/types/api';
+import {
+  InitResponse,
+  IncrementResponse,
+  DecrementResponse,
+  LeaderboardResponse,
+  SubmitScoreRequest,
+  SubmitScoreResponse,
+  LeaderboardEntry,
+} from '../shared/types/api';
 import { redis, reddit, createServer, context, getServerPort } from '@devvit/web/server';
 import { createPost } from './core/post';
 
@@ -90,6 +98,107 @@ router.post<{ postId: string }, DecrementResponse | { status: string; message: s
     });
   }
 );
+
+// Leaderboard endpoints
+router.post<unknown, SubmitScoreResponse, SubmitScoreRequest>(
+  '/api/leaderboard/submit',
+  async (req, res): Promise<void> => {
+    try {
+      const { score } = req.body;
+      const username = await reddit.getCurrentUsername();
+
+      if (!username) {
+        res.status(401).json({ success: false });
+        return;
+      }
+
+      const timestamp = Date.now();
+      const dailyKey = `leaderboard:daily:${new Date().toISOString().split('T')[0]}`;
+      const weeklyKey = `leaderboard:weekly`;
+
+      // Get user's current best score for today
+      const userDailyKey = `user:${username}:daily:${new Date().toISOString().split('T')[0]}`;
+      const currentBest = await redis.get(userDailyKey);
+      const currentBestScore = currentBest ? parseInt(currentBest) : 0;
+
+      // Only update if new score is better
+      if (score > currentBestScore) {
+        await redis.set(userDailyKey, score.toString());
+
+        // Store score in sorted sets (score as score, username:timestamp as member)
+        const member = `${username}:${timestamp}`;
+        await Promise.all([
+          redis.zAdd(dailyKey, { member, score }),
+          redis.zAdd(weeklyKey, { member, score }),
+          // Set expiry for daily key (2 days to be safe)
+          redis.expire(dailyKey, 172800),
+        ]);
+      }
+
+      res.json({ success: true });
+    } catch (error) {
+      console.error('Error submitting score:', error);
+      res.status(500).json({ success: false });
+    }
+  }
+);
+
+router.get<unknown, LeaderboardResponse>('/api/leaderboard/daily', async (_req, res): Promise<void> => {
+  try {
+    const dailyKey = `leaderboard:daily:${new Date().toISOString().split('T')[0]}`;
+
+    // Get top scores in descending order
+    const results = await redis.zRange(dailyKey, 0, 99, { by: 'rank', reverse: true });
+
+    const entries: LeaderboardEntry[] = results.map((item) => {
+      const [username, timestampStr] = item.member.split(':');
+      return {
+        username: username || 'anonymous',
+        score: item.score,
+        timestamp: parseInt(timestampStr || '0'),
+      };
+    });
+
+    res.json({ entries });
+  } catch (error) {
+    console.error('Error fetching daily leaderboard:', error);
+    res.status(500).json({ entries: [] });
+  }
+});
+
+router.get<unknown, LeaderboardResponse>('/api/leaderboard/weekly', async (_req, res): Promise<void> => {
+  try {
+    const weeklyKey = `leaderboard:weekly`;
+    const sevenDaysAgo = Date.now() - 7 * 24 * 60 * 60 * 1000;
+
+    // Remove old entries (older than 7 days)
+    const allEntries = await redis.zRange(weeklyKey, 0, -1, { by: 'rank' });
+    for (const item of allEntries) {
+      const [, timestampStr] = item.member.split(':');
+      const timestamp = parseInt(timestampStr || '0');
+      if (timestamp < sevenDaysAgo) {
+        await redis.zRem(weeklyKey, [item.member]);
+      }
+    }
+
+    // Get top scores
+    const results = await redis.zRange(weeklyKey, 0, 99, { by: 'rank', reverse: true });
+
+    const entries: LeaderboardEntry[] = results.map((item) => {
+      const [username, timestampStr] = item.member.split(':');
+      return {
+        username: username || 'anonymous',
+        score: item.score,
+        timestamp: parseInt(timestampStr || '0'),
+      };
+    });
+
+    res.json({ entries });
+  } catch (error) {
+    console.error('Error fetching weekly leaderboard:', error);
+    res.status(500).json({ entries: [] });
+  }
+});
 
 router.post('/internal/on-app-install', async (_req, res): Promise<void> => {
   try {

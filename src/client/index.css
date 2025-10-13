@@ -1,1 +1,20 @@
 @import 'tailwindcss';
+
+@keyframes sparkle {
+  0% {
+    opacity: 0;
+    transform: scale(0) translateY(0);
+  }
+  50% {
+    opacity: 1;
+    transform: scale(1) translateY(-20px);
+  }
+  100% {
+    opacity: 0;
+    transform: scale(0.5) translateY(-40px);
+  }
+}
+
+.animate-sparkle {
+  animation: sparkle 0.8s ease-out forwards;
+}
