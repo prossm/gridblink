@@ -1,6 +1,6 @@
 import { useState, useCallback, useRef, useEffect } from 'react';
 import { GameState } from '../types/game';
-import { playTone, initAudio } from '../utils/audio';
+import { playTone, initAudio, playGameOverSound } from '../utils/audio';
 
 const FLASH_DURATION = 600; // ms
 const FLASH_GAP = 400; // ms
@@ -30,17 +30,22 @@ export const useGame = () => {
   }, []);
 
   // Play computer sequence
-  const playComputerSequence = useCallback(async (seq: number[]) => {
+  const playComputerSequence = useCallback(async (seq: number[], currentScore: number) => {
     setGameState('computer-turn');
     setPlayerSequence([]);
+
+    // Speed up after round 5
+    const speedMultiplier = currentScore >= 5 ? 0.75 : 1;
+    const adjustedFlashDuration = FLASH_DURATION * speedMultiplier;
+    const adjustedFlashGap = FLASH_GAP * speedMultiplier;
 
     for (let i = 0; i < seq.length; i++) {
       const circleIndex = seq[i];
       if (circleIndex !== undefined) {
-        await new Promise((resolve) => setTimeout(resolve, FLASH_GAP));
+        await new Promise((resolve) => setTimeout(resolve, adjustedFlashGap));
         setFlashingCircle(circleIndex);
         playTone(circleIndex);
-        await new Promise((resolve) => setTimeout(resolve, FLASH_DURATION));
+        await new Promise((resolve) => setTimeout(resolve, adjustedFlashDuration));
         setFlashingCircle(null);
       }
     }
@@ -51,6 +56,7 @@ export const useGame = () => {
 
     // Set timeout for player inactivity
     playerTimeoutRef.current = setTimeout(() => {
+      playGameOverSound();
       setGameState('game-over');
     }, PLAYER_TIMEOUT);
   }, []);
@@ -80,6 +86,7 @@ export const useGame = () => {
         if (playerTimeoutRef.current) {
           clearTimeout(playerTimeoutRef.current);
         }
+        playGameOverSound();
         setGameState('game-over');
         return;
       }
@@ -109,10 +116,12 @@ export const useGame = () => {
           const nextCircle = Math.floor(Math.random() * 9);
           const newSequence = [...sequence, nextCircle];
           setSequence(newSequence);
+          setGameState('computer-turn');
         }, 1000);
       } else {
         // Continue player turn with refreshed timeout
         playerTimeoutRef.current = setTimeout(() => {
+          playGameOverSound();
           setGameState('game-over');
         }, PLAYER_TIMEOUT);
       }
@@ -123,9 +132,9 @@ export const useGame = () => {
   // Play computer sequence when sequence changes
   useEffect(() => {
     if (sequence.length > 0 && gameState === 'computer-turn') {
-      playComputerSequence(sequence);
+      playComputerSequence(sequence, score);
     }
-  }, [sequence, gameState, playComputerSequence]);
+  }, [sequence, gameState, score, playComputerSequence]);
 
   // Cleanup timeout on unmount
   useEffect(() => {

@@ -125,6 +125,20 @@ router.post<unknown, SubmitScoreResponse, SubmitScoreRequest>(
       if (score > currentBestScore) {
         await redis.set(userDailyKey, score.toString());
 
+        // Remove old entries for this user
+        const dailyEntries = await redis.zRange(dailyKey, 0, -1, { by: 'rank' });
+        const weeklyEntries = await redis.zRange(weeklyKey, 0, -1, { by: 'rank' });
+
+        const oldDailyMembers = dailyEntries.filter(e => e.member.startsWith(`${username}:`)).map(e => e.member);
+        const oldWeeklyMembers = weeklyEntries.filter(e => e.member.startsWith(`${username}:`)).map(e => e.member);
+
+        if (oldDailyMembers.length > 0) {
+          await redis.zRem(dailyKey, oldDailyMembers);
+        }
+        if (oldWeeklyMembers.length > 0) {
+          await redis.zRem(weeklyKey, oldWeeklyMembers);
+        }
+
         // Store score in sorted sets (score as score, username:timestamp as member)
         const member = `${username}:${timestamp}`;
         await Promise.all([

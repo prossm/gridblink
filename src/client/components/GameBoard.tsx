@@ -17,22 +17,22 @@ export const GameBoard = ({
   score,
 }: GameBoardProps) => {
   return (
-    <div className="flex flex-col items-center justify-center min-h-screen px-4 py-8 bg-gradient-to-br from-purple-50 to-blue-50">
+    <div className="flex flex-col items-center min-h-screen px-4 py-6 bg-gradient-to-br from-purple-50 to-blue-50 dark:from-gray-900 dark:to-gray-800">
       {/* Score display */}
-      <div className="mb-8 text-center">
-        <p className="text-sm text-gray-600 mb-1">Score</p>
-        <p className="text-4xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-purple-600 to-blue-600">
+      <div className="mb-4 text-center">
+        <p className="text-sm text-gray-600 dark:text-gray-400 mb-1">Score</p>
+        <p className="text-4xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-purple-600 to-blue-600 dark:from-purple-400 dark:to-blue-400">
           {score}
         </p>
       </div>
 
       {/* Sparkles celebration area */}
-      <div className="relative w-full max-w-md mb-4 h-12">
+      <div className="relative w-full max-w-md mb-2 h-12">
         <Sparkles show={showSparkles} />
       </div>
 
       {/* 3x3 Grid */}
-      <div className="grid grid-cols-3 gap-4 w-full max-w-md aspect-square p-4">
+      <div className="grid grid-cols-3 gap-4 w-full max-w-[min(400px,90vw)] aspect-square p-4">
         {Array.from({ length: 9 }, (_, i) => (
           <Circle
             key={i}
@@ -45,8 +45,8 @@ export const GameBoard = ({
       </div>
 
       {/* Turn indicator */}
-      <div className="mt-8 text-center">
-        <p className="text-lg text-gray-700">
+      <div className="mt-4 text-center">
+        <p className="text-lg text-gray-700 dark:text-gray-300">
           {isPlayerTurn ? 'Your turn!' : 'Watch closely...'}
         </p>
       </div>

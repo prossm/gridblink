@@ -70,3 +70,33 @@ export const playTone = (circleIndex: number, duration: number = 0.3): void => {
   oscillator.start(now);
   oscillator.stop(now + duration);
 };
+
+export const playGameOverSound = (): void => {
+  if (!audioContext) return;
+
+  if (currentFrequencies.length === 0) {
+    currentFrequencies = getPentatonicFrequencies(getDayOfYear());
+  }
+
+  // Get root note (one octave below the lowest note in scale)
+  const rootFrequency = (currentFrequencies[0] || 261.63) / 2;
+  const duration = 0.6;
+
+  const oscillator = audioContext.createOscillator();
+  const gainNode = audioContext.createGain();
+
+  oscillator.connect(gainNode);
+  gainNode.connect(audioContext.destination);
+
+  oscillator.frequency.value = rootFrequency;
+  oscillator.type = 'sine';
+
+  // Longer, more pronounced envelope for game over
+  const now = audioContext.currentTime;
+  gainNode.gain.setValueAtTime(0, now);
+  gainNode.gain.linearRampToValueAtTime(0.35, now + 0.03); // Slightly stronger attack
+  gainNode.gain.exponentialRampToValueAtTime(0.01, now + duration); // Longer decay
+
+  oscillator.start(now);
+  oscillator.stop(now + duration);
+};

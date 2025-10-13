@@ -6,9 +6,9 @@ export const CIRCLE_COLORS = [
   { base: '#84B6F4', bright: '#A3CAFF' }, // Sky Blue
   { base: '#C77DFF', bright: '#DCA3FF' }, // Lavender Purple
   { base: '#FF9B71', bright: '#FFB694' }, // Warm Peach
-  { base: '#6BCF7F', bright: '#8FE0A0' }, // Fresh Green
-  { base: '#FF7F9F', bright: '#FFA3BF' }, // Rose
-  { base: '#FFD166', bright: '#FFE18F' }, // Sunshine Yellow
+  { base: '#5FD4A0', bright: '#7EEDC0' }, // Teal Green
+  { base: '#FF5E78', bright: '#FF8299' }, // Bright Rose
+  { base: '#FFB347', bright: '#FFC972' }, // Tangerine Orange
 ];
 
 export const SPARKLE_COLORS = [
