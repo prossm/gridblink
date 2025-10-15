@@ -115,38 +115,103 @@ router.post<unknown, SubmitScoreResponse, SubmitScoreRequest>(
       const timestamp = Date.now();
       const dailyKey = `leaderboard:daily:${new Date().toISOString().split('T')[0]}`;
       const weeklyKey = `leaderboard:weekly`;
+      const allTimeKey = `leaderboard:alltime`;
 
       // Get user's current best score for today
       const userDailyKey = `user:${username}:daily:${new Date().toISOString().split('T')[0]}`;
-      const currentBest = await redis.get(userDailyKey);
-      const currentBestScore = currentBest ? parseInt(currentBest) : 0;
+      const currentDailyBest = await redis.get(userDailyKey);
+      const currentDailyBestScore = currentDailyBest ? parseInt(currentDailyBest) : 0;
 
-      // Only update if new score is better
-      if (score > currentBestScore) {
+      // Get user's current best score for the week
+      // Use a dedicated key that stores: score:timestamp
+      const userWeeklyKey = `user:${username}:weekly`;
+      const userWeeklyData = await redis.get(userWeeklyKey);
+      let currentWeeklyBestScore = 0;
+      let weeklyTimestamp = 0;
+
+      if (userWeeklyData) {
+        const [scoreStr, timestampStr] = userWeeklyData.split(':');
+        const storedScore = parseInt(scoreStr || '0');
+        weeklyTimestamp = parseInt(timestampStr || '0');
+        const sevenDaysAgo = Date.now() - 7 * 24 * 60 * 60 * 1000;
+
+        // Only use the stored score if it's within the last 7 days
+        if (weeklyTimestamp >= sevenDaysAgo) {
+          currentWeeklyBestScore = storedScore;
+        }
+      }
+
+      // Update daily leaderboard if score is better than today's best
+      if (score > currentDailyBestScore) {
         await redis.set(userDailyKey, score.toString());
 
-        // Remove old entries for this user
+        // Remove old daily entries for this user
         const dailyEntries = await redis.zRange(dailyKey, 0, -1, { by: 'rank' });
-        const weeklyEntries = await redis.zRange(weeklyKey, 0, -1, { by: 'rank' });
-
         const oldDailyMembers = dailyEntries.filter(e => e.member.startsWith(`${username}:`)).map(e => e.member);
-        const oldWeeklyMembers = weeklyEntries.filter(e => e.member.startsWith(`${username}:`)).map(e => e.member);
 
         if (oldDailyMembers.length > 0) {
           await redis.zRem(dailyKey, oldDailyMembers);
         }
+
+        // Add new daily score
+        const member = `${username}:${timestamp}`;
+        await Promise.all([
+          redis.zAdd(dailyKey, { member, score }),
+          // Set expiry for daily key (2 days to be safe)
+          redis.expire(dailyKey, 172800),
+        ]);
+      }
+
+      // Update weekly leaderboard if score is better than the user's best in the last 7 days
+      if (score > currentWeeklyBestScore) {
+        // Store the new best weekly score with timestamp
+        await redis.set(userWeeklyKey, `${score}:${timestamp}`);
+
+        // Remove old weekly entries for this user from the sorted set
+        const allWeeklyEntries = await redis.zRange(weeklyKey, 0, -1, { by: 'rank' });
+        const oldWeeklyMembers = allWeeklyEntries
+          .filter(e => e.member.startsWith(`${username}:`))
+          .map(e => e.member);
+
         if (oldWeeklyMembers.length > 0) {
           await redis.zRem(weeklyKey, oldWeeklyMembers);
         }
 
-        // Store score in sorted sets (score as score, username:timestamp as member)
+        // Add new weekly score
         const member = `${username}:${timestamp}`;
-        await Promise.all([
-          redis.zAdd(dailyKey, { member, score }),
-          redis.zAdd(weeklyKey, { member, score }),
-          // Set expiry for daily key (2 days to be safe)
-          redis.expire(dailyKey, 172800),
-        ]);
+        await redis.zAdd(weeklyKey, { member, score });
+      }
+
+      // Update all-time leaderboard
+      // Get user's current all-time best
+      const userAllTimeKey = `user:${username}:alltime`;
+      const currentAllTimeBest = await redis.get(userAllTimeKey);
+      const currentAllTimeBestScore = currentAllTimeBest ? parseInt(currentAllTimeBest) : 0;
+
+      if (score > currentAllTimeBestScore) {
+        // Store the new all-time best
+        await redis.set(userAllTimeKey, score.toString());
+
+        // Remove old all-time entries for this user
+        const allTimeEntries = await redis.zRange(allTimeKey, 0, -1, { by: 'rank' });
+        const oldAllTimeMembers = allTimeEntries
+          .filter(e => e.member.startsWith(`${username}:`))
+          .map(e => e.member);
+
+        if (oldAllTimeMembers.length > 0) {
+          await redis.zRem(allTimeKey, oldAllTimeMembers);
+        }
+
+        // Add new all-time score
+        const member = `${username}:${timestamp}`;
+        await redis.zAdd(allTimeKey, { member, score });
+
+        // Keep only top 100 - remove entries beyond rank 100
+        const allTimeCount = await redis.zCard(allTimeKey);
+        if (allTimeCount > 100) {
+          // Remove lowest scores (remember: 0 is highest rank in ascending order)
+          await redis.zRemRangeByRank(allTimeKey, 0, allTimeCount - 101);
+        }
       }
 
       res.json({ success: true });
@@ -210,6 +275,29 @@ router.get<unknown, LeaderboardResponse>('/api/leaderboard/weekly', async (_req,
     res.json({ entries });
   } catch (error) {
     console.error('Error fetching weekly leaderboard:', error);
+    res.status(500).json({ entries: [] });
+  }
+});
+
+router.get<unknown, LeaderboardResponse>('/api/leaderboard/alltime', async (_req, res): Promise<void> => {
+  try {
+    const allTimeKey = `leaderboard:alltime`;
+
+    // Get top 100 scores in descending order
+    const results = await redis.zRange(allTimeKey, 0, 99, { by: 'rank', reverse: true });
+
+    const entries: LeaderboardEntry[] = results.map((item) => {
+      const [username, timestampStr] = item.member.split(':');
+      return {
+        username: username || 'anonymous',
+        score: item.score,
+        timestamp: parseInt(timestampStr || '0'),
+      };
+    });
+
+    res.json({ entries });
+  } catch (error) {
+    console.error('Error fetching all-time leaderboard:', error);
     res.status(500).json({ entries: [] });
   }
 });

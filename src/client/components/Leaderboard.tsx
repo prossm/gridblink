@@ -33,7 +33,7 @@ export const Leaderboard = ({
       <div className="flex gap-2 mb-6">
         <button
           onClick={() => onTypeChange('daily')}
-          className={`flex-1 py-3 px-6 rounded-lg font-semibold transition-all ${
+          className={`flex-1 py-3 px-4 rounded-lg font-semibold transition-all ${
             type === 'daily'
               ? 'bg-gradient-to-r from-purple-600 to-blue-600 text-white shadow-lg'
               : 'bg-white text-gray-600 hover:bg-gray-50'
@@ -43,13 +43,23 @@ export const Leaderboard = ({
         </button>
         <button
           onClick={() => onTypeChange('weekly')}
-          className={`flex-1 py-3 px-6 rounded-lg font-semibold transition-all ${
+          className={`flex-1 py-3 px-4 rounded-lg font-semibold transition-all ${
             type === 'weekly'
               ? 'bg-gradient-to-r from-purple-600 to-blue-600 text-white shadow-lg'
               : 'bg-white text-gray-600 hover:bg-gray-50'
           }`}
         >
           7-Day
+        </button>
+        <button
+          onClick={() => onTypeChange('alltime')}
+          className={`flex-1 py-3 px-4 rounded-lg font-semibold transition-all ${
+            type === 'alltime'
+              ? 'bg-gradient-to-r from-purple-600 to-blue-600 text-white shadow-lg'
+              : 'bg-white text-gray-600 hover:bg-gray-50'
+          }`}
+        >
+          All-Time
         </button>
       </div>
 

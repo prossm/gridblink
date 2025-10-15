@@ -17,7 +17,7 @@ export const App = () => {
     resetGame,
   } = useGame();
 
-  const { dailyLeaderboard, weeklyLeaderboard } = useLeaderboard(
+  const { dailyLeaderboard, weeklyLeaderboard, allTimeLeaderboard } = useLeaderboard(
     username || 'anonymous',
     score,
     gameState === 'game-over'
@@ -35,6 +35,7 @@ export const App = () => {
         username={username || 'anonymous'}
         dailyLeaderboard={dailyLeaderboard}
         weeklyLeaderboard={weeklyLeaderboard}
+        allTimeLeaderboard={allTimeLeaderboard}
       />
     );
   }

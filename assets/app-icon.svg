@@ -1,0 +1,82 @@
+<svg width="512" height="512" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <!-- Circle gradients -->
+    <linearGradient id="icon-circle1" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#FF6B9D;stop-opacity:1" />
+      <stop offset="100%" style="stop-color:#FF8FB8;stop-opacity:1" />
+    </linearGradient>
+
+    <linearGradient id="icon-circle2" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#FEC859;stop-opacity:1" />
+      <stop offset="100%" style="stop-color:#FFD77D;stop-opacity:1" />
+    </linearGradient>
+
+    <linearGradient id="icon-circle3" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#A7E9AF;stop-opacity:1" />
+      <stop offset="100%" style="stop-color:#C4F5CB;stop-opacity:1" />
+    </linearGradient>
+
+    <linearGradient id="icon-circle4" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#84B6F4;stop-opacity:1" />
+      <stop offset="100%" style="stop-color:#A3CAFF;stop-opacity:1" />
+    </linearGradient>
+
+    <linearGradient id="icon-circle5" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#C77DFF;stop-opacity:1" />
+      <stop offset="100%" style="stop-color:#DCA3FF;stop-opacity:1" />
+    </linearGradient>
+
+    <linearGradient id="icon-circle6" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#FF9B71;stop-opacity:1" />
+      <stop offset="100%" style="stop-color:#FFB694;stop-opacity:1" />
+    </linearGradient>
+
+    <linearGradient id="icon-circle7" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#5FD4A0;stop-opacity:1" />
+      <stop offset="100%" style="stop-color:#7EEDC0;stop-opacity:1" />
+    </linearGradient>
+
+    <linearGradient id="icon-circle8" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#FF5E78;stop-opacity:1" />
+      <stop offset="100%" style="stop-color:#FF8299;stop-opacity:1" />
+    </linearGradient>
+
+    <linearGradient id="icon-circle9" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#FFB347;stop-opacity:1" />
+      <stop offset="100%" style="stop-color:#FFC972;stop-opacity:1" />
+    </linearGradient>
+
+    <filter id="icon-shadow">
+      <feDropShadow dx="0" dy="3" stdDeviation="6" flood-opacity="0.2"/>
+    </filter>
+
+    <linearGradient id="icon-bg" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#7c3aed;stop-opacity:1" />
+      <stop offset="100%" style="stop-color:#2563eb;stop-opacity:1" />
+    </linearGradient>
+  </defs>
+
+  <!-- Background with rounded square -->
+  <rect width="512" height="512" rx="80" fill="url(#icon-bg)"/>
+
+  <!-- 3x3 Grid of circles - smaller and centered -->
+  <g transform="translate(106, 106)">
+    <!-- Row 1 -->
+    <circle cx="50" cy="50" r="42" fill="url(#icon-circle1)" filter="url(#icon-shadow)"/>
+    <circle cx="150" cy="50" r="42" fill="url(#icon-circle2)" filter="url(#icon-shadow)"/>
+    <circle cx="250" cy="50" r="42" fill="url(#icon-circle3)" filter="url(#icon-shadow)"/>
+
+    <!-- Row 2 -->
+    <circle cx="50" cy="150" r="42" fill="url(#icon-circle4)" filter="url(#icon-shadow)"/>
+    <circle cx="150" cy="150" r="42" fill="url(#icon-circle5)" filter="url(#icon-shadow)"/>
+    <circle cx="250" cy="150" r="42" fill="url(#icon-circle6)" filter="url(#icon-shadow)"/>
+
+    <!-- Row 3 -->
+    <circle cx="50" cy="250" r="42" fill="url(#icon-circle7)" filter="url(#icon-shadow)"/>
+    <circle cx="150" cy="250" r="42" fill="url(#icon-circle8)" filter="url(#icon-shadow)"/>
+    <circle cx="250" cy="250" r="42" fill="url(#icon-circle9)" filter="url(#icon-shadow)"/>
+  </g>
+
+  <!-- Highlight ring on center circle to draw attention -->
+  <circle cx="256" cy="256" r="48" fill="none" stroke="white" stroke-width="3" opacity="0.6"/>
+</svg>

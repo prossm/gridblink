@@ -17,7 +17,7 @@ export const GameBoard = ({
   score,
 }: GameBoardProps) => {
   return (
-    <div className="flex flex-col items-center min-h-screen px-4 py-6 bg-gradient-to-br from-purple-50 to-blue-50 dark:from-gray-900 dark:to-gray-800">
+    <div className="flex flex-col items-center min-h-screen px-4 py-6 bg-gradient-to-br from-purple-100/40 to-blue-100/40 dark:from-gray-900 dark:to-gray-800">
       {/* Score display */}
       <div className="mb-4 text-center">
         <p className="text-sm text-gray-600 dark:text-gray-400 mb-1">Score</p>

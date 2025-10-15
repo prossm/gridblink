@@ -8,6 +8,7 @@ interface GameOverProps {
   username: string;
   dailyLeaderboard: LeaderboardEntry[];
   weeklyLeaderboard: LeaderboardEntry[];
+  allTimeLeaderboard: LeaderboardEntry[];
 }
 
 export const GameOver = ({
@@ -16,6 +17,7 @@ export const GameOver = ({
   username,
   dailyLeaderboard,
   weeklyLeaderboard,
+  allTimeLeaderboard,
 }: GameOverProps) => {
   const [leaderboardType, setLeaderboardType] = useState<LeaderboardType>('daily');
   const isChampion = score >= 200;
@@ -53,7 +55,13 @@ export const GameOver = ({
       <div className="w-full mb-8">
         <h2 className="text-2xl font-bold text-center text-gray-800 mb-6">Leaderboard</h2>
         <Leaderboard
-          entries={leaderboardType === 'daily' ? dailyLeaderboard : weeklyLeaderboard}
+          entries={
+            leaderboardType === 'daily'
+              ? dailyLeaderboard
+              : leaderboardType === 'weekly'
+                ? weeklyLeaderboard
+                : allTimeLeaderboard
+          }
           currentUsername={username}
           currentScore={score}
           type={leaderboardType}

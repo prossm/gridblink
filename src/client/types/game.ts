@@ -16,4 +16,4 @@ export interface LeaderboardEntry {
   rank?: number;
 }
 
-export type LeaderboardType = 'daily' | 'weekly';
+export type LeaderboardType = 'daily' | 'weekly' | 'alltime';

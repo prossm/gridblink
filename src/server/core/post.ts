@@ -10,11 +10,11 @@ export const createPost = async () => {
     splash: {
       // Splash Screen Configuration
       appDisplayName: 'Gridblink',
-      backgroundUri: 'default-splash.png',
-      buttonLabel: 'Play Now',
-      description: 'Test your memory with this musical pattern game!',
+      backgroundUri: 'splash-background.png',
+      buttonLabel: 'Start Playing',
+      description: 'Watch, remember, repeat!\nTest your memory with colorful circles and musical tones.\nEach round gets harder - how far can you go?',
       heading: 'Gridblink',
-      appIconUri: 'default-icon.png',
+      appIconUri: 'app-icon.png',
     },
     postData: {
       gameState: 'initial',

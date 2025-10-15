@@ -80,23 +80,32 @@ export const playGameOverSound = (): void => {
 
   // Get root note (one octave below the lowest note in scale)
   const rootFrequency = (currentFrequencies[0] || 261.63) / 2;
-  const duration = 0.6;
+  const duration = 1.1; // 0.5 seconds longer (was 0.6)
 
-  const oscillator = audioContext.createOscillator();
-  const gainNode = audioContext.createGain();
+  // Create a minor triad: root, minor third, perfect fifth
+  const minorThird = rootFrequency * 1.189207; // 6/5 ratio (minor third)
+  const perfectFifth = rootFrequency * 1.5; // 3/2 ratio (perfect fifth)
 
-  oscillator.connect(gainNode);
-  gainNode.connect(audioContext.destination);
+  // Create three oscillators for the minor triad
+  const frequencies = [rootFrequency, minorThird, perfectFifth];
 
-  oscillator.frequency.value = rootFrequency;
-  oscillator.type = 'sine';
+  frequencies.forEach((freq) => {
+    const oscillator = audioContext.createOscillator();
+    const gainNode = audioContext.createGain();
 
-  // Longer, more pronounced envelope for game over
-  const now = audioContext.currentTime;
-  gainNode.gain.setValueAtTime(0, now);
-  gainNode.gain.linearRampToValueAtTime(0.35, now + 0.03); // Slightly stronger attack
-  gainNode.gain.exponentialRampToValueAtTime(0.01, now + duration); // Longer decay
+    oscillator.connect(gainNode);
+    gainNode.connect(audioContext.destination);
 
-  oscillator.start(now);
-  oscillator.stop(now + duration);
+    oscillator.frequency.value = freq;
+    oscillator.type = 'sine';
+
+    // Louder and longer envelope for game over (louder than playTone's 0.3)
+    const now = audioContext.currentTime;
+    gainNode.gain.setValueAtTime(0, now);
+    gainNode.gain.linearRampToValueAtTime(0.4, now + 0.03); // Louder attack (was 0.35)
+    gainNode.gain.exponentialRampToValueAtTime(0.01, now + duration); // Longer decay
+
+    oscillator.start(now);
+    oscillator.stop(now + duration);
+  });
 };
