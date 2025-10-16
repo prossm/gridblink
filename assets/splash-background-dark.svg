@@ -1,9 +1,9 @@
 <svg width="1200" height="800" xmlns="http://www.w3.org/2000/svg">
-  <!-- Background gradient - balanced tones for both light and dark text -->
+  <!-- Dark background gradient -->
   <defs>
     <linearGradient id="bgGradient" x1="0%" y1="0%" x2="100%" y2="100%">
-      <stop offset="0%" style="stop-color:#a78af9;stop-opacity:1" />
-      <stop offset="100%" style="stop-color:#6ba4fa;stop-opacity:1" />
+      <stop offset="0%" style="stop-color:#1f2937;stop-opacity:1" />
+      <stop offset="100%" style="stop-color:#111827;stop-opacity:1" />
     </linearGradient>
 
     <!-- Circle colors matching the game -->
@@ -53,7 +53,7 @@
     </linearGradient>
 
     <filter id="shadow">
-      <feDropShadow dx="0" dy="4" stdDeviation="8" flood-opacity="0.15"/>
+      <feDropShadow dx="0" dy="4" stdDeviation="8" flood-opacity="0.3"/>
     </filter>
 
     <filter id="glow">
@@ -103,62 +103,62 @@
 
   <!-- Musical decorative elements at bottom -->
   <!-- Dancing circles -->
-  <circle cx="150" cy="700" r="25" fill="url(#circle1)" opacity="0.6" filter="url(#shadow)">
+  <circle cx="150" cy="700" r="25" fill="url(#circle1)" opacity="0.7" filter="url(#shadow)">
     <animate attributeName="cy" values="700;680;700" dur="2s" repeatCount="indefinite"/>
-    <animate attributeName="opacity" values="0.6;0.8;0.6" dur="2s" repeatCount="indefinite"/>
+    <animate attributeName="opacity" values="0.7;0.9;0.7" dur="2s" repeatCount="indefinite"/>
   </circle>
-  <circle cx="300" cy="720" r="20" fill="url(#circle4)" opacity="0.5" filter="url(#shadow)">
+  <circle cx="300" cy="720" r="20" fill="url(#circle4)" opacity="0.6" filter="url(#shadow)">
     <animate attributeName="cy" values="720;705;720" dur="1.8s" repeatCount="indefinite"/>
-    <animate attributeName="opacity" values="0.5;0.7;0.5" dur="1.8s" repeatCount="indefinite"/>
+    <animate attributeName="opacity" values="0.6;0.8;0.6" dur="1.8s" repeatCount="indefinite"/>
   </circle>
-  <circle cx="500" cy="710" r="28" fill="url(#circle5)" opacity="0.7" filter="url(#shadow)">
+  <circle cx="500" cy="710" r="28" fill="url(#circle5)" opacity="0.8" filter="url(#shadow)">
     <animate attributeName="cy" values="710;688;710" dur="2.2s" repeatCount="indefinite"/>
-    <animate attributeName="opacity" values="0.7;0.9;0.7" dur="2.2s" repeatCount="indefinite"/>
+    <animate attributeName="opacity" values="0.8;1;0.8" dur="2.2s" repeatCount="indefinite"/>
   </circle>
-  <circle cx="700" cy="725" r="22" fill="url(#circle7)" opacity="0.55" filter="url(#shadow)">
+  <circle cx="700" cy="725" r="22" fill="url(#circle7)" opacity="0.65" filter="url(#shadow)">
     <animate attributeName="cy" values="725;708;725" dur="1.9s" repeatCount="indefinite"/>
-    <animate attributeName="opacity" values="0.55;0.75;0.55" dur="1.9s" repeatCount="indefinite"/>
+    <animate attributeName="opacity" values="0.65;0.85;0.65" dur="1.9s" repeatCount="indefinite"/>
   </circle>
-  <circle cx="900" cy="705" r="26" fill="url(#circle9)" opacity="0.65" filter="url(#shadow)">
+  <circle cx="900" cy="705" r="26" fill="url(#circle9)" opacity="0.75" filter="url(#shadow)">
     <animate attributeName="cy" values="705;683;705" dur="2.1s" repeatCount="indefinite"/>
-    <animate attributeName="opacity" values="0.65;0.85;0.65" dur="2.1s" repeatCount="indefinite"/>
+    <animate attributeName="opacity" values="0.75;0.95;0.75" dur="2.1s" repeatCount="indefinite"/>
   </circle>
-  <circle cx="1050" cy="715" r="24" fill="url(#circle2)" opacity="0.6" filter="url(#shadow)">
+  <circle cx="1050" cy="715" r="24" fill="url(#circle2)" opacity="0.7" filter="url(#shadow)">
     <animate attributeName="cy" values="715;695;715" dur="2.3s" repeatCount="indefinite"/>
-    <animate attributeName="opacity" values="0.6;0.8;0.6" dur="2.3s" repeatCount="indefinite"/>
+    <animate attributeName="opacity" values="0.7;0.9;0.7" dur="2.3s" repeatCount="indefinite"/>
   </circle>
 
-  <!-- Musical notes - connected eighth notes -->
-  <g opacity="0.5">
+  <!-- Musical notes - connected eighth notes (brighter for dark mode) -->
+  <g opacity="0.6">
     <!-- Connected eighth notes 1 -->
-    <ellipse cx="400" cy="680" rx="8" ry="6" fill="#9333ea" transform="rotate(-20 400 680)"/>
-    <rect x="407" y="655" width="3" height="28" fill="#9333ea"/>
-    <ellipse cx="425" cy="675" rx="8" ry="6" fill="#9333ea" transform="rotate(-20 425 675)"/>
-    <rect x="432" y="650" width="3" height="28" fill="#9333ea"/>
+    <ellipse cx="400" cy="680" rx="8" ry="6" fill="#c084fc" transform="rotate(-20 400 680)"/>
+    <rect x="407" y="655" width="3" height="28" fill="#c084fc"/>
+    <ellipse cx="425" cy="675" rx="8" ry="6" fill="#c084fc" transform="rotate(-20 425 675)"/>
+    <rect x="432" y="650" width="3" height="28" fill="#c084fc"/>
     <!-- Beam connecting the stems -->
-    <path d="M 410 655 L 435 650 L 435 654 L 410 659 Z" fill="#9333ea"/>
-    <animate attributeName="opacity" values="0.5;0.8;0.5" dur="3s" repeatCount="indefinite"/>
+    <path d="M 410 655 L 435 650 L 435 654 L 410 659 Z" fill="#c084fc"/>
+    <animate attributeName="opacity" values="0.6;0.9;0.6" dur="3s" repeatCount="indefinite"/>
   </g>
 
-  <g opacity="0.4">
+  <g opacity="0.5">
     <!-- Connected eighth notes 2 -->
-    <ellipse cx="600" cy="690" rx="7" ry="5" fill="#2563eb" transform="rotate(15 600 690)"/>
-    <rect x="606" y="667" width="3" height="26" fill="#2563eb"/>
-    <ellipse cx="622" cy="685" rx="7" ry="5" fill="#2563eb" transform="rotate(15 622 685)"/>
-    <rect x="628" y="662" width="3" height="26" fill="#2563eb"/>
+    <ellipse cx="600" cy="690" rx="7" ry="5" fill="#60a5fa" transform="rotate(15 600 690)"/>
+    <rect x="606" y="667" width="3" height="26" fill="#60a5fa"/>
+    <ellipse cx="622" cy="685" rx="7" ry="5" fill="#60a5fa" transform="rotate(15 622 685)"/>
+    <rect x="628" y="662" width="3" height="26" fill="#60a5fa"/>
     <!-- Beam connecting the stems -->
-    <path d="M 609 667 L 631 662 L 631 666 L 609 671 Z" fill="#2563eb"/>
-    <animate attributeName="opacity" values="0.4;0.7;0.4" dur="2.5s" repeatCount="indefinite"/>
+    <path d="M 609 667 L 631 662 L 631 666 L 609 671 Z" fill="#60a5fa"/>
+    <animate attributeName="opacity" values="0.5;0.8;0.5" dur="2.5s" repeatCount="indefinite"/>
   </g>
 
-  <g opacity="0.45">
+  <g opacity="0.55">
     <!-- Connected eighth notes 3 -->
-    <ellipse cx="780" cy="685" rx="7" ry="5" fill="#c026d3" transform="rotate(-10 780 685)"/>
-    <rect x="786" y="662" width="3" height="26" fill="#c026d3"/>
-    <ellipse cx="802" cy="680" rx="7" ry="5" fill="#c026d3" transform="rotate(-10 802 680)"/>
-    <rect x="808" y="657" width="3" height="26" fill="#c026d3"/>
+    <ellipse cx="780" cy="685" rx="7" ry="5" fill="#e879f9" transform="rotate(-10 780 685)"/>
+    <rect x="786" y="662" width="3" height="26" fill="#e879f9"/>
+    <ellipse cx="802" cy="680" rx="7" ry="5" fill="#e879f9" transform="rotate(-10 802 680)"/>
+    <rect x="808" y="657" width="3" height="26" fill="#e879f9"/>
     <!-- Beam connecting the stems -->
-    <path d="M 789 662 L 811 657 L 811 661 L 789 666 Z" fill="#c026d3"/>
-    <animate attributeName="opacity" values="0.45;0.75;0.45" dur="2.8s" repeatCount="indefinite"/>
+    <path d="M 789 662 L 811 657 L 811 661 L 789 666 Z" fill="#e879f9"/>
+    <animate attributeName="opacity" values="0.55;0.85;0.55" dur="2.8s" repeatCount="indefinite"/>
   </g>
 </svg>

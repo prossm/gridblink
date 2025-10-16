@@ -31,6 +31,6 @@
     "onAppInstall": "/internal/on-app-install"
   },
   "dev": {
-    "subreddit": "gridblink_dev"
+    "subreddit": "gridblink"
   }
 }

@@ -1,7 +1,9 @@
 // Audio system for Gridblink game
 // Generates pentatonic scale tones for the 9 circles
 
-const audioContext = typeof window !== 'undefined' ? new (window.AudioContext || (window as any).webkitAudioContext)() : null;
+import { getGameDayOfYear } from '../../shared/utils/gameDay';
+
+const audioContext = typeof window !== 'undefined' ? new (window.AudioContext || (window as unknown as { webkitAudioContext: typeof AudioContext }).webkitAudioContext)() : null;
 
 // Pentatonic scale notes (frequencies in Hz)
 // Using C major pentatonic: C, D, E, G, A plus upper C, D, E, G
@@ -27,29 +29,20 @@ const getPentatonicFrequencies = (dayOfYear: number): number[] => {
   ].slice(0, 9);
 };
 
-// Get today's pentatonic scale
-const getDayOfYear = (): number => {
-  const now = new Date();
-  const start = new Date(now.getFullYear(), 0, 0);
-  const diff = now.getTime() - start.getTime();
-  const oneDay = 1000 * 60 * 60 * 24;
-  return Math.floor(diff / oneDay);
-};
-
 let currentFrequencies: number[] = [];
 
 export const initAudio = () => {
   if (audioContext && audioContext.state === 'suspended') {
-    audioContext.resume();
+    void audioContext.resume();
   }
-  currentFrequencies = getPentatonicFrequencies(getDayOfYear());
+  currentFrequencies = getPentatonicFrequencies(getGameDayOfYear());
 };
 
 export const playTone = (circleIndex: number, duration: number = 0.3): void => {
   if (!audioContext) return;
 
   if (currentFrequencies.length === 0) {
-    currentFrequencies = getPentatonicFrequencies(getDayOfYear());
+    currentFrequencies = getPentatonicFrequencies(getGameDayOfYear());
   }
 
   const oscillator = audioContext.createOscillator();
@@ -75,19 +68,18 @@ export const playGameOverSound = (): void => {
   if (!audioContext) return;
 
   if (currentFrequencies.length === 0) {
-    currentFrequencies = getPentatonicFrequencies(getDayOfYear());
+    currentFrequencies = getPentatonicFrequencies(getGameDayOfYear());
   }
 
   // Get root note (one octave below the lowest note in scale)
   const rootFrequency = (currentFrequencies[0] || 261.63) / 2;
   const duration = 1.1; // 0.5 seconds longer (was 0.6)
 
-  // Create a minor triad: root, minor third, perfect fifth
-  const minorThird = rootFrequency * 1.189207; // 6/5 ratio (minor third)
+  // Create a perfect fifth interval: root + perfect fifth
   const perfectFifth = rootFrequency * 1.5; // 3/2 ratio (perfect fifth)
 
-  // Create three oscillators for the minor triad
-  const frequencies = [rootFrequency, minorThird, perfectFifth];
+  // Create two oscillators for the perfect fifth
+  const frequencies = [rootFrequency, perfectFifth];
 
   frequencies.forEach((freq) => {
     const oscillator = audioContext.createOscillator();

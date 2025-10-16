@@ -10,6 +10,7 @@ import {
 } from '../shared/types/api';
 import { redis, reddit, createServer, context, getServerPort } from '@devvit/web/server';
 import { createPost } from './core/post';
+import { getGameDayString } from '../shared/utils/gameDay';
 
 const app = express();
 
@@ -107,18 +108,22 @@ router.post<unknown, SubmitScoreResponse, SubmitScoreRequest>(
       const { score } = req.body;
       const username = await reddit.getCurrentUsername();
 
+      console.log(`[Leaderboard Submit] User: ${username}, Score: ${score}`);
+
       if (!username) {
+        console.log('[Leaderboard Submit] No username - returning 401');
         res.status(401).json({ success: false });
         return;
       }
 
       const timestamp = Date.now();
-      const dailyKey = `leaderboard:daily:${new Date().toISOString().split('T')[0]}`;
+      const gameDay = getGameDayString(); // Uses 5am ET reset
+      const dailyKey = `leaderboard:daily:${gameDay}`;
       const weeklyKey = `leaderboard:weekly`;
       const allTimeKey = `leaderboard:alltime`;
 
       // Get user's current best score for today
-      const userDailyKey = `user:${username}:daily:${new Date().toISOString().split('T')[0]}`;
+      const userDailyKey = `user:${username}:daily:${gameDay}`;
       const currentDailyBest = await redis.get(userDailyKey);
       const currentDailyBestScore = currentDailyBest ? parseInt(currentDailyBest) : 0;
 
@@ -214,6 +219,7 @@ router.post<unknown, SubmitScoreResponse, SubmitScoreRequest>(
         }
       }
 
+      console.log(`[Leaderboard Submit] Success for ${username} with score ${score}`);
       res.json({ success: true });
     } catch (error) {
       console.error('Error submitting score:', error);
@@ -224,8 +230,10 @@ router.post<unknown, SubmitScoreResponse, SubmitScoreRequest>(
 
 router.get<unknown, LeaderboardResponse>('/api/leaderboard/daily', async (_req, res): Promise<void> => {
   try {
-    const dailyKey = `leaderboard:daily:${new Date().toISOString().split('T')[0]}`;
+    const gameDay = getGameDayString(); // Uses 5am ET reset
+    const dailyKey = `leaderboard:daily:${gameDay}`;
 
+    console.log('[Leaderboard Fetch] Fetching daily leaderboard');
     // Get top scores in descending order
     const results = await redis.zRange(dailyKey, 0, 99, { by: 'rank', reverse: true });
 
@@ -238,6 +246,7 @@ router.get<unknown, LeaderboardResponse>('/api/leaderboard/daily', async (_req, 
       };
     });
 
+    console.log(`[Leaderboard Fetch] Daily entries: ${entries.length}`);
     res.json({ entries });
   } catch (error) {
     console.error('Error fetching daily leaderboard:', error);

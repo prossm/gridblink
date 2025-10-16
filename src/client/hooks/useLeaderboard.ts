@@ -12,16 +12,38 @@ export const useLeaderboard = (_username: string, score: number, gameOver: boole
   const fetchLeaderboards = useCallback(async () => {
     try {
       setLoading(true);
+      console.log('[Leaderboard] Fetching leaderboards...');
+      const timestamp = Date.now();
       const [dailyRes, weeklyRes, allTimeRes] = await Promise.all([
-        fetch(`${API_BASE}/api/leaderboard/daily`),
-        fetch(`${API_BASE}/api/leaderboard/weekly`),
-        fetch(`${API_BASE}/api/leaderboard/alltime`),
+        fetch(`${API_BASE}/api/leaderboard/daily?t=${timestamp}`, {
+          cache: 'no-cache',
+          headers: { 'Cache-Control': 'no-cache, no-store, must-revalidate' },
+        }),
+        fetch(`${API_BASE}/api/leaderboard/weekly?t=${timestamp}`, {
+          cache: 'no-cache',
+          headers: { 'Cache-Control': 'no-cache, no-store, must-revalidate' },
+        }),
+        fetch(`${API_BASE}/api/leaderboard/alltime?t=${timestamp}`, {
+          cache: 'no-cache',
+          headers: { 'Cache-Control': 'no-cache, no-store, must-revalidate' },
+        }),
       ]);
+
+      console.log('[Leaderboard] Response statuses:', {
+        daily: dailyRes.status,
+        weekly: weeklyRes.status,
+        allTime: allTimeRes.status,
+      });
 
       if (dailyRes.ok && weeklyRes.ok && allTimeRes.ok) {
         const daily = await dailyRes.json();
         const weekly = await weeklyRes.json();
         const allTime = await allTimeRes.json();
+        console.log('[Leaderboard] Data received:', {
+          daily: daily.entries?.length || 0,
+          weekly: weekly.entries?.length || 0,
+          allTime: allTime.entries?.length || 0,
+        });
         setDailyLeaderboard(daily.entries || []);
         setWeeklyLeaderboard(weekly.entries || []);
         setAllTimeLeaderboard(allTime.entries || []);
@@ -36,11 +58,15 @@ export const useLeaderboard = (_username: string, score: number, gameOver: boole
   const submitScore = useCallback(
     async (finalScore: number) => {
       try {
-        await fetch(`${API_BASE}/api/leaderboard/submit`, {
+        console.log('[Leaderboard] Submitting score:', finalScore);
+        const response = await fetch(`${API_BASE}/api/leaderboard/submit`, {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({ score: finalScore }),
         });
+        console.log('[Leaderboard] Submit response status:', response.status);
+        const result = await response.json();
+        console.log('[Leaderboard] Submit response:', result);
         // Refetch leaderboards after submitting
         await fetchLeaderboards();
       } catch (error) {
@@ -52,13 +78,13 @@ export const useLeaderboard = (_username: string, score: number, gameOver: boole
 
   // Fetch leaderboards on mount
   useEffect(() => {
-    fetchLeaderboards();
+    void fetchLeaderboards();
   }, [fetchLeaderboards]);
 
   // Submit score when game is over
   useEffect(() => {
     if (gameOver && score > 0) {
-      submitScore(score);
+      void submitScore(score);
     }
   }, [gameOver, score, submitScore]);
 

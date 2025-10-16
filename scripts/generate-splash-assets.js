@@ -26,6 +26,26 @@ fs.writeFileSync(splashOutputPath, splashPngBuffer);
 console.log(`Generated splash background: ${splashOutputPath}`);
 console.log(`Size: ${splashPngData.width}x${splashPngData.height}`);
 
+// Generate dark mode splash background
+const splashDarkSvgPath = path.join(__dirname, '../assets/splash-background-dark.svg');
+const splashDarkSvgBuffer = fs.readFileSync(splashDarkSvgPath);
+
+const splashDarkResvg = new Resvg(splashDarkSvgBuffer, {
+  fitTo: {
+    mode: 'width',
+    value: 2048,
+  },
+});
+
+const splashDarkPngData = splashDarkResvg.render();
+const splashDarkPngBuffer = splashDarkPngData.asPng();
+
+const splashDarkOutputPath = path.join(__dirname, '../assets/splash-background-dark.png');
+fs.writeFileSync(splashDarkOutputPath, splashDarkPngBuffer);
+
+console.log(`Generated dark splash background: ${splashDarkOutputPath}`);
+console.log(`Size: ${splashDarkPngData.width}x${splashDarkPngData.height}`);
+
 // Generate app icon
 const iconSvgPath = path.join(__dirname, '../assets/app-icon.svg');
 const iconSvgBuffer = fs.readFileSync(iconSvgPath);

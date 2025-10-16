@@ -12,8 +12,11 @@ export const CIRCLE_COLORS = [
 ];
 
 export const SPARKLE_COLORS = [
-  '#FFD700', // Gold
-  '#FFFFFF', // White
-  '#FFC0CB', // Light Pink
-  '#E0E0FF', // Light Purple
+  '#FF6B9D', // Coral Pink
+  '#C77DFF', // Lavender Purple
+  '#84B6F4', // Sky Blue
+  '#5FD4A0', // Teal Green
+  '#FFB347', // Tangerine Orange
+  '#FF5E78', // Bright Rose
+  '#FEC859', // Golden Yellow
 ];

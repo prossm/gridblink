@@ -45,7 +45,7 @@ export const GameOver = ({
 
         <button
           onClick={onPlayAgain}
-          className="mt-4 px-8 py-3 text-lg font-bold text-white bg-gradient-to-r from-purple-600 to-blue-600 rounded-full shadow-lg hover:shadow-xl hover:scale-105 transition-all duration-200 active:scale-95"
+          className="mt-4 px-8 py-3 text-lg font-bold text-white bg-gradient-to-r from-purple-600 to-blue-600 rounded-full shadow-lg hover:shadow-xl hover:scale-105 transition-all duration-200 active:scale-95 cursor-pointer"
         >
           Play Again
         </button>

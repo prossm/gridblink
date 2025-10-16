@@ -48,13 +48,13 @@ export const Circle = ({ index, isFlashing, onClick, disabled }: CircleProps) =>
   const handleClick = () => {
     // Quick press animation
     setIsPressed(true);
-    setTimeout(() => setIsPressed(false), 100);
+    setTimeout(() => setIsPressed(false), 50);
     onClick();
   };
 
   return (
     <button
-      className="relative flex items-center justify-center aspect-square rounded-full focus:outline-none"
+      className="relative flex items-center justify-center aspect-square rounded-full focus:outline-none cursor-pointer"
       style={{
         backgroundColor: isFlashing ? color.dark : color.base,
         transform: isFlashing
@@ -67,7 +67,8 @@ export const Circle = ({ index, isFlashing, onClick, disabled }: CircleProps) =>
           : isPressed
             ? `inset 0 2px 8px rgba(0,0,0,0.3)`
             : 'none',
-        transition: 'transform 0.05s ease-out, box-shadow 0.05s ease-out, background-color 0.2s',
+        transition: 'transform 0.03s ease-out, box-shadow 0.03s ease-out, background-color 0.2s',
+        cursor: disabled ? 'not-allowed' : 'pointer',
       }}
       onClick={handleClick}
       onMouseDown={handleMouseDown}

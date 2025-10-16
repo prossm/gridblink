@@ -1,4 +1,4 @@
-export type GameState = 'splash' | 'playing' | 'computer-turn' | 'player-turn' | 'game-over';
+export type GameState = 'intro' | 'playing' | 'computer-turn' | 'player-turn' | 'game-over';
 
 export interface GameData {
   state: GameState;

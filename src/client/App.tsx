@@ -1,7 +1,7 @@
 import { useCounter } from './hooks/useCounter';
 import { useGame } from './hooks/useGame';
 import { useLeaderboard } from './hooks/useLeaderboard';
-import { SplashScreen } from './components/SplashScreen';
+import { IntroScreen } from './components/IntroScreen';
 import { GameBoard } from './components/GameBoard';
 import { GameOver } from './components/GameOver';
 
@@ -10,11 +10,14 @@ export const App = () => {
   const {
     gameState,
     score,
+    personalBest,
     flashingCircle,
     showSparkles,
+    gameSpeed,
+    setGameSpeed,
     startGame,
     handleCircleClick,
-    resetGame,
+    playAgain,
   } = useGame();
 
   const { dailyLeaderboard, weeklyLeaderboard, allTimeLeaderboard } = useLeaderboard(
@@ -23,15 +26,15 @@ export const App = () => {
     gameState === 'game-over'
   );
 
-  if (gameState === 'splash') {
-    return <SplashScreen onStart={startGame} />;
+  if (gameState === 'intro') {
+    return <IntroScreen onStart={startGame} gameSpeed={gameSpeed} onGameSpeedChange={setGameSpeed} />;
   }
 
   if (gameState === 'game-over') {
     return (
       <GameOver
         score={score}
-        onPlayAgain={resetGame}
+        onPlayAgain={playAgain}
         username={username || 'anonymous'}
         dailyLeaderboard={dailyLeaderboard}
         weeklyLeaderboard={weeklyLeaderboard}
@@ -47,6 +50,7 @@ export const App = () => {
       isPlayerTurn={gameState === 'player-turn'}
       showSparkles={showSparkles}
       score={score}
+      personalBest={personalBest}
     />
   );
 };
