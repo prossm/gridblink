@@ -43,11 +43,20 @@ router.get<{ postId: string }, InitResponse | { status: string; message: string 
         reddit.getCurrentUsername(),
       ]);
 
+      // Get user's personal best
+      let personalBest = 0;
+      if (username) {
+        const userPersonalBestKey = `user:${username}:personal_best`;
+        const storedBest = await redis.get(userPersonalBestKey);
+        personalBest = storedBest ? parseInt(storedBest) : 0;
+      }
+
       res.json({
         type: 'init',
         postId: postId,
         count: count ? parseInt(count) : 0,
         username: username ?? 'anonymous',
+        personalBest: personalBest,
       });
     } catch (error) {
       console.error(`API Init Error for post ${postId}:`, error);
@@ -185,6 +194,16 @@ router.post<unknown, SubmitScoreResponse, SubmitScoreRequest>(
         // Add new weekly score
         const member = `${username}:${timestamp}`;
         await redis.zAdd(weeklyKey, { member, score });
+      }
+
+      // Update personal best (all-time)
+      const userPersonalBestKey = `user:${username}:personal_best`;
+      const currentPersonalBest = await redis.get(userPersonalBestKey);
+      const currentPersonalBestScore = currentPersonalBest ? parseInt(currentPersonalBest) : 0;
+
+      if (score > currentPersonalBestScore) {
+        // Store the new personal best
+        await redis.set(userPersonalBestKey, score.toString());
       }
 
       // Update all-time leaderboard
@@ -340,6 +359,32 @@ router.post('/internal/menu/post-create', async (_req, res): Promise<void> => {
     res.status(400).json({
       status: 'error',
       message: 'Failed to create post',
+    });
+  }
+});
+
+router.post('/internal/scheduler/daily-post', async (_req, res): Promise<void> => {
+  console.log(`[Scheduler] ========== DAILY POST SCHEDULER TRIGGERED ==========`);
+  console.log(`[Scheduler] Time: ${new Date().toISOString()}`);
+  console.log(`[Scheduler] Subreddit: ${context.subredditName}`);
+
+  try {
+    // Run as APP since scheduler has no user context
+    const post = await createPost({ runAs: 'APP' });
+
+    console.log(`[Scheduler] ✅ SUCCESS: Created post ${post.id} in r/${context.subredditName}`);
+    res.json({
+      status: 'success',
+      message: `Daily post created: ${post.id}`,
+      postId: post.id,
+    });
+  } catch (error) {
+    console.error(`[Scheduler] ❌ ERROR: Failed to create daily post`);
+    console.error(`[Scheduler] Error details:`, error);
+    res.status(500).json({
+      status: 'error',
+      message: 'Failed to create daily post',
+      error: error instanceof Error ? error.message : String(error),
     });
   }
 });

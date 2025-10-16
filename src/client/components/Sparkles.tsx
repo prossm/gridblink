@@ -33,7 +33,7 @@ export const Sparkles = ({ show }: SparklesProps) => {
           y: Math.random() * 120 - 10, // Allow -10% to 110% for softer boundary
           color: color1,
           color2: color2,
-          size: 3 + Math.random() * 9, // Bigger size range
+          size: 3 + Math.random() * 7, // Bigger size range
           delay: Math.random() * 0.5, // Longer stagger window
           duration: 0.6 + Math.random() * 0.6, // Vary duration 0.6-1.2s
           animationType: animationTypes[Math.floor(Math.random() * animationTypes.length)] || 'float',
@@ -73,7 +73,7 @@ export const Sparkles = ({ show }: SparklesProps) => {
               borderRadius: '50%',
               animationDelay: `${sparkle.delay}s`,
               animationDuration: `${sparkle.duration}s`,
-              boxShadow: `0 0 ${sparkle.size * 5}px ${sparkle.color}, 0 0 ${sparkle.size * 3}px ${sparkle.color2}`,
+              boxShadow: `0 0 ${sparkle.size * 1.3}px ${sparkle.color}, 0 0 ${sparkle.size * 1.7}px ${sparkle.color2}`,
             }}
           />
         );

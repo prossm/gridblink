@@ -30,6 +30,14 @@
   "triggers": {
     "onAppInstall": "/internal/on-app-install"
   },
+  "scheduler": {
+    "tasks": {
+      "daily-post-creation": {
+        "endpoint": "/internal/scheduler/daily-post",
+        "cron": "0 10 * * *"
+      }
+    }
+  },
   "dev": {
     "subreddit": "gridblink"
   }

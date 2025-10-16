@@ -9,25 +9,16 @@ const MAX_SEQUENCE_LENGTH = 200;
 
 export type GameSpeed = 1 | 1.5 | 2;
 
-const PERSONAL_BEST_KEY = 'gridblink_personal_best';
+interface UseGameProps {
+  initialPersonalBest?: number;
+}
 
-const getPersonalBest = (): number => {
-  if (typeof window === 'undefined') return 0;
-  const stored = localStorage.getItem(PERSONAL_BEST_KEY);
-  return stored ? parseInt(stored, 10) : 0;
-};
-
-const setPersonalBestStorage = (score: number): void => {
-  if (typeof window === 'undefined') return;
-  localStorage.setItem(PERSONAL_BEST_KEY, score.toString());
-};
-
-export const useGame = () => {
+export const useGame = ({ initialPersonalBest = 0 }: UseGameProps = {}) => {
   const [gameState, setGameState] = useState<GameState>('intro');
   const [sequence, setSequence] = useState<number[]>([]);
   const [playerSequence, setPlayerSequence] = useState<number[]>([]);
   const [score, setScore] = useState(0);
-  const [personalBest, setPersonalBest] = useState(getPersonalBest());
+  const [personalBest, setPersonalBest] = useState(initialPersonalBest);
   const [flashingCircle, setFlashingCircle] = useState<number | null>(null);
   const [showSparkles, setShowSparkles] = useState(false);
   const [gameSpeed, setGameSpeed] = useState<GameSpeed>(1);
@@ -149,7 +140,7 @@ export const useGame = () => {
         }, PLAYER_TIMEOUT);
       }
     },
-    [gameState, playerSequence, sequence, score]
+    [gameState, playerSequence, sequence, score, personalBest]
   );
 
   // Play computer sequence when sequence changes

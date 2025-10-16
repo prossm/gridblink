@@ -16,6 +16,7 @@
     "zstack"
   ],
   "typescript.tsdk": "node_modules/typescript/lib",
+  "css.lint.unknownAtRules": "ignore",
   "files.exclude": {
     "**/.git": false
   }

@@ -1,6 +1,6 @@
 import { context, reddit } from '@devvit/web/server';
 
-export const createPost = async () => {
+export const createPost = async (options?: { runAs?: 'USER' | 'APP' }) => {
   const { subredditName } = context;
   if (!subredditName) {
     throw new Error('subredditName is required');
@@ -22,5 +22,6 @@ export const createPost = async () => {
     },
     subredditName: subredditName,
     title: 'gridblink - memory & music game',
+    runAs: options?.runAs || 'USER', // Default to USER for backwards compatibility
   });
 };

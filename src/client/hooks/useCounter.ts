@@ -4,6 +4,7 @@ import type { InitResponse, IncrementResponse, DecrementResponse } from '../../s
 interface CounterState {
   count: number;
   username: string | null;
+  personalBest: number;
   loading: boolean;
 }
 
@@ -11,6 +12,7 @@ export const useCounter = () => {
   const [state, setState] = useState<CounterState>({
     count: 0,
     username: null,
+    personalBest: 0,
     loading: true,
   });
   const [postId, setPostId] = useState<string | null>(null);
@@ -23,7 +25,12 @@ export const useCounter = () => {
         if (!res.ok) throw new Error(`HTTP ${res.status}`);
         const data: InitResponse = await res.json();
         if (data.type !== 'init') throw new Error('Unexpected response');
-        setState({ count: data.count, username: data.username, loading: false });
+        setState({
+          count: data.count,
+          username: data.username,
+          personalBest: data.personalBest,
+          loading: false
+        });
         setPostId(data.postId);
       } catch (err) {
         console.error('Failed to init counter', err);
