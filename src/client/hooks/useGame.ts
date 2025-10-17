@@ -6,6 +6,7 @@ const BASE_FLASH_DURATION = 600; // ms
 const BASE_FLASH_GAP = 400; // ms
 const PLAYER_TIMEOUT = 5000; // ms
 const MAX_SEQUENCE_LENGTH = 200;
+const GAME_SPEED_STORAGE_KEY = 'gridblink_game_speed';
 
 export type GameSpeed = 1 | 1.5 | 2;
 
@@ -21,7 +22,18 @@ export const useGame = ({ initialPersonalBest = 0 }: UseGameProps = {}) => {
   const [personalBest, setPersonalBest] = useState(initialPersonalBest);
   const [flashingCircle, setFlashingCircle] = useState<number | null>(null);
   const [showSparkles, setShowSparkles] = useState(false);
-  const [gameSpeed, setGameSpeed] = useState<GameSpeed>(1);
+  const [gameSpeed, setGameSpeed] = useState<GameSpeed>(() => {
+    // Initialize from localStorage, default to 1x for new players
+    if (typeof window === 'undefined') return 1;
+    const stored = localStorage.getItem(GAME_SPEED_STORAGE_KEY);
+    if (stored) {
+      const parsed = parseFloat(stored);
+      if (parsed === 1 || parsed === 1.5 || parsed === 2) {
+        return parsed as GameSpeed;
+      }
+    }
+    return 1;
+  });
 
   const playerTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   const lastInputTimeRef = useRef<number>(Date.now());
@@ -175,6 +187,13 @@ export const useGame = ({ initialPersonalBest = 0 }: UseGameProps = {}) => {
       }
     };
   }, []);
+
+  // Persist game speed to localStorage
+  useEffect(() => {
+    if (typeof window !== 'undefined') {
+      localStorage.setItem(GAME_SPEED_STORAGE_KEY, gameSpeed.toString());
+    }
+  }, [gameSpeed]);
 
   const resetGame = useCallback(() => {
     if (playerTimeoutRef.current) {

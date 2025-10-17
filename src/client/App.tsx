@@ -20,7 +20,7 @@ export const App = () => {
     playAgain,
   } = useGame({ initialPersonalBest: serverPersonalBest });
 
-  const { dailyLeaderboard, weeklyLeaderboard, allTimeLeaderboard, loading, refreshLeaderboards } = useLeaderboard(
+  const { dailyLeaderboard, weeklyLeaderboard, allTimeLeaderboard } = useLeaderboard(
     username || 'anonymous',
     score,
     gameState === 'game-over'
@@ -39,8 +39,6 @@ export const App = () => {
         dailyLeaderboard={dailyLeaderboard}
         weeklyLeaderboard={weeklyLeaderboard}
         allTimeLeaderboard={allTimeLeaderboard}
-        loading={loading}
-        onRefresh={refreshLeaderboards}
       />
     );
   }

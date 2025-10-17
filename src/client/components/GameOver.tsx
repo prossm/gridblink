@@ -1,7 +1,6 @@
 import { useState } from 'react';
 import { Leaderboard } from './Leaderboard';
 import { LeaderboardEntry, LeaderboardType } from '../types/game';
-import { HiArrowPath } from 'react-icons/hi2';
 
 interface GameOverProps {
   score: number;
@@ -10,8 +9,6 @@ interface GameOverProps {
   dailyLeaderboard: LeaderboardEntry[];
   weeklyLeaderboard: LeaderboardEntry[];
   allTimeLeaderboard: LeaderboardEntry[];
-  loading: boolean;
-  onRefresh: () => void;
 }
 
 export const GameOver = ({
@@ -21,8 +18,6 @@ export const GameOver = ({
   dailyLeaderboard,
   weeklyLeaderboard,
   allTimeLeaderboard,
-  loading,
-  onRefresh,
 }: GameOverProps) => {
   const [leaderboardType, setLeaderboardType] = useState<LeaderboardType>('daily');
   const isChampion = score >= 200;
@@ -58,18 +53,7 @@ export const GameOver = ({
 
       {/* Leaderboard */}
       <div className="w-full mb-8">
-        <div className="flex items-center justify-center gap-4 mb-6">
-          <h2 className="text-2xl font-bold text-gray-800">Leaderboard</h2>
-          <button
-            onClick={onRefresh}
-            disabled={loading}
-            className="p-2 bg-white rounded-full shadow-md hover:shadow-lg transition-all cursor-pointer active:scale-95 disabled:opacity-50 disabled:cursor-not-allowed"
-            aria-label="Refresh leaderboard"
-            type="button"
-          >
-            <HiArrowPath className={`w-5 h-5 text-gray-700 ${loading ? 'animate-spin' : ''}`} />
-          </button>
-        </div>
+        <h2 className="text-2xl font-bold text-center text-gray-800 mb-6">Leaderboard</h2>
         <Leaderboard
           entries={
             leaderboardType === 'daily'
