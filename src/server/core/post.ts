@@ -21,7 +21,7 @@ export const createPost = async (options?: { runAs?: 'USER' | 'APP' }) => {
       score: 0,
     },
     subredditName: subredditName,
-    title: 'gridblink - memory & music game',
+    title: 'How far can you get? Memory and music game 🎵🧠',
     runAs: options?.runAs || 'USER', // Default to USER for backwards compatibility
   });
 };
