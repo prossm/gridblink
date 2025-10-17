@@ -77,7 +77,7 @@ export const Leaderboard = ({
       )}
 
       {/* Leaderboard list */}
-      <div className="bg-white rounded-lg shadow-lg overflow-hidden max-h-[400px] overflow-y-auto">
+      <div className="bg-white rounded-lg shadow-lg overflow-hidden">
         {entries.length === 0 ? (
           <div className="p-8 text-center text-gray-500">
             No scores yet. Be the first!
