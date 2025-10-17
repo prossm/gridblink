@@ -30,6 +30,7 @@ const getPentatonicFrequencies = (dayOfYear: number): number[] => {
 };
 
 let currentFrequencies: number[] = [];
+let isMuted = false;
 
 export const initAudio = () => {
   if (audioContext && audioContext.state === 'suspended') {
@@ -38,8 +39,16 @@ export const initAudio = () => {
   currentFrequencies = getPentatonicFrequencies(getGameDayOfYear());
 };
 
+export const setMuted = (muted: boolean) => {
+  isMuted = muted;
+};
+
+export const getMuted = (): boolean => {
+  return isMuted;
+};
+
 export const playTone = (circleIndex: number, duration: number = 0.3): void => {
-  if (!audioContext) return;
+  if (!audioContext || isMuted) return;
 
   if (currentFrequencies.length === 0) {
     currentFrequencies = getPentatonicFrequencies(getGameDayOfYear());
@@ -65,7 +74,7 @@ export const playTone = (circleIndex: number, duration: number = 0.3): void => {
 };
 
 export const playGameOverSound = (): void => {
-  if (!audioContext) return;
+  if (!audioContext || isMuted) return;
 
   if (currentFrequencies.length === 0) {
     currentFrequencies = getPentatonicFrequencies(getGameDayOfYear());

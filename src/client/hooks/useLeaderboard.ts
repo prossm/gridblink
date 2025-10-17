@@ -12,8 +12,11 @@ export const useLeaderboard = (_username: string, score: number, gameOver: boole
   const fetchLeaderboards = useCallback(async () => {
     try {
       setLoading(true);
-      console.log('[Leaderboard] Fetching leaderboards...');
+      console.log('[Leaderboard] Starting leaderboard fetch...');
+      console.log('[Leaderboard] Current URL:', window.location.href);
+      console.log('[Leaderboard] Origin:', window.location.origin);
       const timestamp = Date.now();
+      console.log('[Leaderboard] Timestamp:', timestamp);
       const [dailyRes, weeklyRes, allTimeRes] = await Promise.all([
         fetch(`${API_BASE}/api/leaderboard/daily?t=${timestamp}`, {
           cache: 'no-cache',
@@ -44,12 +47,36 @@ export const useLeaderboard = (_username: string, score: number, gameOver: boole
           weekly: weekly.entries?.length || 0,
           allTime: allTime.entries?.length || 0,
         });
+        console.log('[Leaderboard] Raw data:', { daily, weekly, allTime });
         setDailyLeaderboard(daily.entries || []);
         setWeeklyLeaderboard(weekly.entries || []);
         setAllTimeLeaderboard(allTime.entries || []);
+      } else {
+        console.error('[Leaderboard] Some requests failed:', {
+          daily: { ok: dailyRes.ok, status: dailyRes.status },
+          weekly: { ok: weeklyRes.ok, status: weeklyRes.status },
+          allTime: { ok: allTimeRes.ok, status: allTimeRes.status },
+        });
+        // Try to get error messages
+        try {
+          const dailyError = await dailyRes.text();
+          const weeklyError = await weeklyRes.text();
+          const allTimeError = await allTimeRes.text();
+          console.error('[Leaderboard] Error responses:', {
+            daily: dailyError,
+            weekly: weeklyError,
+            allTime: allTimeError,
+          });
+        } catch (e) {
+          console.error('[Leaderboard] Could not read error responses:', e);
+        }
       }
     } catch (error) {
-      console.error('Error fetching leaderboards:', error);
+      console.error('[Leaderboard] Error fetching leaderboards:', error);
+      if (error instanceof Error) {
+        console.error('[Leaderboard] Error message:', error.message);
+        console.error('[Leaderboard] Error stack:', error.stack);
+      }
     } finally {
       setLoading(false);
     }
@@ -64,13 +91,26 @@ export const useLeaderboard = (_username: string, score: number, gameOver: boole
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({ score: finalScore }),
         });
-        console.log('[Leaderboard] Submit response status:', response.status);
+        console.log('[Leaderboard] Submit response status:', response.status, response.ok ? 'OK' : 'FAILED');
+
+        if (!response.ok) {
+          const errorText = await response.text();
+          console.error('[Leaderboard] Submit error response:', errorText);
+          return;
+        }
+
         const result = await response.json();
         console.log('[Leaderboard] Submit response:', result);
+
         // Refetch leaderboards after submitting
+        console.log('[Leaderboard] Refetching leaderboards after score submission...');
         await fetchLeaderboards();
       } catch (error) {
-        console.error('Error submitting score:', error);
+        console.error('[Leaderboard] Error submitting score:', error);
+        if (error instanceof Error) {
+          console.error('[Leaderboard] Error message:', error.message);
+          console.error('[Leaderboard] Error stack:', error.stack);
+        }
       }
     },
     [fetchLeaderboards]

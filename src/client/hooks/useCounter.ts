@@ -21,10 +21,35 @@ export const useCounter = () => {
   useEffect(() => {
     const init = async () => {
       try {
+        console.log('[Init] Starting initialization...');
+        console.log('[Init] Current URL:', window.location.href);
+        console.log('[Init] Origin:', window.location.origin);
+        console.log('[Init] Pathname:', window.location.pathname);
+        console.log('[Init] Fetching initial data from /api/init...');
+
         const res = await fetch('/api/init');
-        if (!res.ok) throw new Error(`HTTP ${res.status}`);
+        console.log('[Init] Response status:', res.status, res.ok ? 'OK' : 'FAILED');
+
+        if (!res.ok) {
+          const errorText = await res.text();
+          console.error('[Init] Error response:', errorText);
+          throw new Error(`HTTP ${res.status}`);
+        }
+
         const data: InitResponse = await res.json();
-        if (data.type !== 'init') throw new Error('Unexpected response');
+        console.log('[Init] Received data:', data);
+
+        if (data.type !== 'init') {
+          console.error('[Init] Unexpected response type:', data.type);
+          throw new Error('Unexpected response');
+        }
+
+        console.log('[Init] Setting state with:', {
+          count: data.count,
+          username: data.username,
+          personalBest: data.personalBest,
+        });
+
         setState({
           count: data.count,
           username: data.username,
@@ -32,8 +57,14 @@ export const useCounter = () => {
           loading: false
         });
         setPostId(data.postId);
+
+        console.log('[Init] Initialization complete');
       } catch (err) {
-        console.error('Failed to init counter', err);
+        console.error('[Init] Failed to init counter:', err);
+        if (err instanceof Error) {
+          console.error('[Init] Error message:', err.message);
+          console.error('[Init] Error stack:', err.stack);
+        }
         setState((prev) => ({ ...prev, loading: false }));
       }
     };

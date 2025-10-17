@@ -39,6 +39,7 @@ export const useGame = ({ initialPersonalBest = 0 }: UseGameProps = {}) => {
 
   // Play computer sequence
   const playComputerSequence = useCallback(async (seq: number[], currentScore: number, speed: GameSpeed) => {
+    console.log('[Game] Computer turn starting, sequence length:', seq.length);
     setGameState('computer-turn');
     setPlayerSequence([]);
 
@@ -58,12 +59,17 @@ export const useGame = ({ initialPersonalBest = 0 }: UseGameProps = {}) => {
       }
     }
 
+    // Add small delay before enabling player input to ensure last flash completes
+    await new Promise((resolve) => setTimeout(resolve, 100));
+
     // Start player turn
+    console.log('[Game] Player turn starting - circles should be clickable now');
     setGameState('player-turn');
     lastInputTimeRef.current = Date.now();
 
     // Set timeout for player inactivity
     playerTimeoutRef.current = setTimeout(() => {
+      console.log('[Game] Player timeout - no input received');
       playGameOverSound();
       setGameState('game-over');
     }, PLAYER_TIMEOUT);
@@ -72,7 +78,11 @@ export const useGame = ({ initialPersonalBest = 0 }: UseGameProps = {}) => {
   // Handle player click
   const handleCircleClick = useCallback(
     (index: number) => {
-      if (gameState !== 'player-turn') return;
+      if (gameState !== 'player-turn') {
+        console.log('[Game] Click ignored - not player turn. Current state:', gameState);
+        return;
+      }
+      console.log('[Game] Circle clicked:', index, '- Expected:', sequence[playerSequence.length]);
 
       // Reset inactivity timer
       lastInputTimeRef.current = Date.now();
@@ -110,9 +120,9 @@ export const useGame = ({ initialPersonalBest = 0 }: UseGameProps = {}) => {
         setScore(newScore);
 
         // Update personal best if exceeded
+        // Note: Personal best is also saved to Redis via the leaderboard submit endpoint
         if (newScore > personalBest) {
           setPersonalBest(newScore);
-          setPersonalBestStorage(newScore);
         }
 
         // Show celebration
@@ -142,6 +152,13 @@ export const useGame = ({ initialPersonalBest = 0 }: UseGameProps = {}) => {
     },
     [gameState, playerSequence, sequence, score, personalBest]
   );
+
+  // Sync personal best from server when it changes
+  useEffect(() => {
+    if (initialPersonalBest > personalBest) {
+      setPersonalBest(initialPersonalBest);
+    }
+  }, [initialPersonalBest, personalBest]);
 
   // Play computer sequence when sequence changes
   useEffect(() => {

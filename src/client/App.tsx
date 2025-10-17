@@ -6,7 +6,7 @@ import { GameBoard } from './components/GameBoard';
 import { GameOver } from './components/GameOver';
 
 export const App = () => {
-  const { username } = useCounter();
+  const { username, personalBest: serverPersonalBest } = useCounter();
   const {
     gameState,
     score,
@@ -18,9 +18,9 @@ export const App = () => {
     startGame,
     handleCircleClick,
     playAgain,
-  } = useGame();
+  } = useGame({ initialPersonalBest: serverPersonalBest });
 
-  const { dailyLeaderboard, weeklyLeaderboard, allTimeLeaderboard } = useLeaderboard(
+  const { dailyLeaderboard, weeklyLeaderboard, allTimeLeaderboard, loading, refreshLeaderboards } = useLeaderboard(
     username || 'anonymous',
     score,
     gameState === 'game-over'
@@ -39,6 +39,8 @@ export const App = () => {
         dailyLeaderboard={dailyLeaderboard}
         weeklyLeaderboard={weeklyLeaderboard}
         allTimeLeaderboard={allTimeLeaderboard}
+        loading={loading}
+        onRefresh={refreshLeaderboards}
       />
     );
   }

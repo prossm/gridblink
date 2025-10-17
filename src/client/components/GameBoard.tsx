@@ -1,5 +1,7 @@
 import { Circle } from './Circle';
 import { Sparkles } from './Sparkles';
+import { useSound } from '../hooks/useSound';
+import { HiSpeakerWave, HiSpeakerXMark } from 'react-icons/hi2';
 
 interface GameBoardProps {
   flashingCircle: number | null;
@@ -18,6 +20,7 @@ export const GameBoard = ({
   score,
   personalBest,
 }: GameBoardProps) => {
+  const { isSoundEnabled, toggleSound } = useSound();
 
   return (
     <div className="flex flex-col items-center min-h-screen px-4 py-6 bg-gradient-to-br from-purple-100/40 to-blue-100/40">
@@ -30,6 +33,20 @@ export const GameBoard = ({
           </p>
         </div>
       )}
+
+      {/* Sound Toggle - Top Right */}
+      <button
+        onClick={toggleSound}
+        className="absolute top-4 right-4 w-11 h-11 flex items-center justify-center bg-white rounded-full shadow-md hover:shadow-lg transition-all cursor-pointer active:scale-95"
+        aria-label={isSoundEnabled ? 'Mute sounds' : 'Unmute sounds'}
+        type="button"
+      >
+        {isSoundEnabled ? (
+          <HiSpeakerWave className="w-6 h-6 text-gray-700" />
+        ) : (
+          <HiSpeakerXMark className="w-6 h-6 text-gray-700" />
+        )}
+      </button>
 
       {/* Score display */}
       <div className="mb-4 text-center">
@@ -58,10 +75,22 @@ export const GameBoard = ({
       </div>
 
       {/* Turn indicator */}
-      <div className="mt-4 text-center">
-        <p className="text-lg font-semibold text-gray-700">
-          {isPlayerTurn ? '👆 Your turn!' : '👀 Watch closely...'}
-        </p>
+      <div className="mt-4 flex justify-center">
+        <div
+          className="px-6 py-3 bg-white rounded-xl shadow-lg"
+          style={{
+            boxShadow: isPlayerTurn
+              ? '0 10px 15px -3px rgba(34, 197, 94, 0.3), 0 4px 6px -4px rgba(34, 197, 94, 0.3)'
+              : '0 10px 15px -3px rgba(234, 179, 8, 0.3), 0 4px 6px -4px rgba(234, 179, 8, 0.3)'
+          }}
+        >
+          <p className="text-lg font-bold flex items-center gap-2">
+            <span>{isPlayerTurn ? '☝' : '👀'}</span>
+            <span className="text-transparent bg-clip-text bg-gradient-to-r from-purple-600 to-blue-600">
+              {isPlayerTurn ? 'Your turn!' : 'Watch closely...'}
+            </span>
+          </p>
+        </div>
       </div>
     </div>
   );
