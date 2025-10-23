@@ -31,12 +31,32 @@ const getPentatonicFrequencies = (dayOfYear: number): number[] => {
 
 let currentFrequencies: number[] = [];
 let isMuted = false;
+let timeSettings: { timezone: string; resetHour: number } | null = null;
 
-export const initAudio = () => {
+// Fetch time settings from server
+async function fetchTimeSettings() {
+  try {
+    const response = await fetch('/api/settings/time');
+    if (!response.ok) throw new Error('Failed to fetch settings');
+    timeSettings = await response.json();
+  } catch (error) {
+    console.error('Error fetching time settings, using defaults:', error);
+    timeSettings = { timezone: 'America/New_York', resetHour: 5 };
+  }
+}
+
+export const initAudio = async () => {
   if (audioContext && audioContext.state === 'suspended') {
     void audioContext.resume();
   }
-  currentFrequencies = getPentatonicFrequencies(getGameDayOfYear());
+
+  // Fetch settings if not already loaded
+  if (!timeSettings) {
+    await fetchTimeSettings();
+  }
+
+  const dayOfYear = getGameDayOfYear(timeSettings!.timezone, timeSettings!.resetHour);
+  currentFrequencies = getPentatonicFrequencies(dayOfYear);
 };
 
 export const setMuted = (muted: boolean) => {
@@ -51,7 +71,10 @@ export const playTone = (circleIndex: number, duration: number = 0.3): void => {
   if (!audioContext || isMuted) return;
 
   if (currentFrequencies.length === 0) {
-    currentFrequencies = getPentatonicFrequencies(getGameDayOfYear());
+    // Fallback to defaults if initAudio wasn't called
+    const tz = timeSettings?.timezone || 'America/New_York';
+    const hour = timeSettings?.resetHour || 5;
+    currentFrequencies = getPentatonicFrequencies(getGameDayOfYear(tz, hour));
   }
 
   const oscillator = audioContext.createOscillator();
@@ -77,7 +100,10 @@ export const playGameOverSound = (): void => {
   if (!audioContext || isMuted) return;
 
   if (currentFrequencies.length === 0) {
-    currentFrequencies = getPentatonicFrequencies(getGameDayOfYear());
+    // Fallback to defaults if initAudio wasn't called
+    const tz = timeSettings?.timezone || 'America/New_York';
+    const hour = timeSettings?.resetHour || 5;
+    currentFrequencies = getPentatonicFrequencies(getGameDayOfYear(tz, hour));
   }
 
   // Get root note (one octave below the lowest note in scale)

@@ -1,23 +1,28 @@
 /**
- * Game day utilities - handles 5am ET reset for daily leaderboards and musical scales
+ * Game day utilities - handles configurable daily reset for leaderboards and musical scales
  */
 
 /**
  * Gets the current "game day" date string (YYYY-MM-DD format).
- * The game day changes at 5am Eastern Time, not at midnight.
+ * The game day changes at the configured reset hour in the configured timezone.
  *
- * For example:
+ * @param timezone - IANA timezone string (e.g., 'America/New_York', 'Europe/London')
+ * @param resetHour - Hour of day (0-23) when the game day resets
+ *
+ * For example (with timezone='America/New_York', resetHour=5):
  * - 4:59am ET on Jan 15 -> returns "2025-01-14"
  * - 5:00am ET on Jan 15 -> returns "2025-01-15"
  * - 11:59pm ET on Jan 15 -> returns "2025-01-15"
  */
-export const getGameDayString = (): string => {
+export const getGameDayString = (
+  timezone: string = 'America/New_York',
+  resetHour: number = 5
+): string => {
   const now = new Date();
 
-  // Convert current time to Eastern Time
-  // Use Intl.DateTimeFormat to get ET components
-  const etFormatter = new Intl.DateTimeFormat('en-US', {
-    timeZone: 'America/New_York',
+  // Convert current time to the configured timezone
+  const formatter = new Intl.DateTimeFormat('en-US', {
+    timeZone: timezone,
     year: 'numeric',
     month: '2-digit',
     day: '2-digit',
@@ -26,20 +31,20 @@ export const getGameDayString = (): string => {
     hour12: false,
   });
 
-  const parts = etFormatter.formatToParts(now);
-  const etYear = parseInt(parts.find(p => p.type === 'year')?.value ?? '0');
-  const etMonth = parseInt(parts.find(p => p.type === 'month')?.value ?? '0');
-  const etDay = parseInt(parts.find(p => p.type === 'day')?.value ?? '0');
-  const etHour = parseInt(parts.find(p => p.type === 'hour')?.value ?? '0');
+  const parts = formatter.formatToParts(now);
+  const tzYear = parseInt(parts.find(p => p.type === 'year')?.value ?? '0');
+  const tzMonth = parseInt(parts.find(p => p.type === 'month')?.value ?? '0');
+  const tzDay = parseInt(parts.find(p => p.type === 'day')?.value ?? '0');
+  const tzHour = parseInt(parts.find(p => p.type === 'hour')?.value ?? '0');
 
-  // If it's before 5am ET, use the previous day
+  // If it's before the reset hour, use the previous day
   let gameDay: Date;
-  if (etHour < 5) {
+  if (tzHour < resetHour) {
     // Use previous day
-    gameDay = new Date(etYear, etMonth - 1, etDay - 1);
+    gameDay = new Date(tzYear, tzMonth - 1, tzDay - 1);
   } else {
     // Use current day
-    gameDay = new Date(etYear, etMonth - 1, etDay);
+    gameDay = new Date(tzYear, tzMonth - 1, tzDay);
   }
 
   // Format as YYYY-MM-DD
@@ -52,10 +57,16 @@ export const getGameDayString = (): string => {
 
 /**
  * Gets the day-of-year for the current game day (for musical scale rotation).
- * Resets at 5am Eastern Time.
+ * Resets at the configured hour in the configured timezone.
+ *
+ * @param timezone - IANA timezone string (e.g., 'America/New_York', 'Europe/London')
+ * @param resetHour - Hour of day (0-23) when the game day resets
  */
-export const getGameDayOfYear = (): number => {
-  const gameDayString = getGameDayString();
+export const getGameDayOfYear = (
+  timezone: string = 'America/New_York',
+  resetHour: number = 5
+): number => {
+  const gameDayString = getGameDayString(timezone, resetHour);
   const parts = gameDayString.split('-').map(Number);
   const year = parts[0] ?? 0;
   const month = parts[1] ?? 0;

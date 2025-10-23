@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { Leaderboard } from './Leaderboard';
 import { LeaderboardEntry, LeaderboardType } from '../types/game';
 
@@ -20,7 +20,50 @@ export const GameOver = ({
   allTimeLeaderboard,
 }: GameOverProps) => {
   const [leaderboardType, setLeaderboardType] = useState<LeaderboardType>('daily');
+  const [isSubscribed, setIsSubscribed] = useState(false);
+  const [isSubscribing, setIsSubscribing] = useState(false);
   const isChampion = score >= 200;
+
+  // Check subscription status on mount
+  useEffect(() => {
+    const checkSubscriptionStatus = async () => {
+      try {
+        const response = await fetch('/api/subscribe/status');
+        const data = await response.json();
+        setIsSubscribed(data.isSubscribed || false);
+      } catch (error) {
+        console.error('Error checking subscription status:', error);
+      }
+    };
+
+    void checkSubscriptionStatus();
+  }, []);
+
+  const handleSubscribe = async () => {
+    if (isSubscribing || isSubscribed) return;
+
+    setIsSubscribing(true);
+    try {
+      const response = await fetch('/api/subscribe', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+      });
+
+      const data = await response.json();
+
+      if (data.success) {
+        setIsSubscribed(true);
+      } else {
+        console.error('Failed to subscribe:', data.message);
+      }
+    } catch (error) {
+      console.error('Error subscribing:', error);
+    } finally {
+      setIsSubscribing(false);
+    }
+  };
 
   return (
     <div className="flex flex-col items-center justify-start min-h-screen px-4 py-8 bg-gradient-to-br from-purple-50 to-blue-50 overflow-y-auto">
@@ -49,6 +92,23 @@ export const GameOver = ({
         >
           Play Again
         </button>
+
+        {/* Subscribe Button - Hidden until app is published and permission is approved */}
+        {/* Uncomment after public launch when SUBSCRIBE_TO_SUBREDDIT permission is granted */}
+        {/* {!isSubscribed && (
+          <button
+            onClick={handleSubscribe}
+            disabled={isSubscribing}
+            className="mt-3 px-6 py-2 text-sm font-semibold text-purple-600 bg-white border-2 border-purple-600 rounded-full shadow-md hover:shadow-lg hover:scale-105 transition-all duration-200 active:scale-95 cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed"
+          >
+            {isSubscribing ? 'Subscribing...' : '🔔 Subscribe for Daily Games'}
+          </button>
+        )}
+        {isSubscribed && (
+          <div className="mt-3 px-6 py-2 text-sm font-semibold text-green-600 bg-green-50 border-2 border-green-600 rounded-full shadow-md">
+            ✓ Subscribed!
+          </div>
+        )} */}
       </div>
 
       {/* Leaderboard */}

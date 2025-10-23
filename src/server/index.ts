@@ -8,7 +8,7 @@ import {
   SubmitScoreResponse,
   LeaderboardEntry,
 } from '../shared/types/api';
-import { redis, reddit, createServer, context, getServerPort } from '@devvit/web/server';
+import { redis, reddit, createServer, context, getServerPort, settings } from '@devvit/web/server';
 import { createPost } from './core/post';
 import { getGameDayString } from '../shared/utils/gameDay';
 
@@ -22,6 +22,18 @@ app.use(express.urlencoded({ extended: true }));
 app.use(express.text());
 
 const router = express.Router();
+
+// Helper to get timezone and reset hour settings
+async function getTimeSettings() {
+  const [timezone, resetHour] = await Promise.all([
+    settings.get('timezone'),
+    settings.get('dailyResetHour'),
+  ]);
+  return {
+    timezone: (timezone as string) || 'America/New_York',
+    resetHour: parseInt((resetHour as string) || '5', 10),
+  };
+}
 
 router.get<{ postId: string }, InitResponse | { status: string; message: string }>(
   '/api/init',
@@ -126,7 +138,8 @@ router.post<unknown, SubmitScoreResponse, SubmitScoreRequest>(
       }
 
       const timestamp = Date.now();
-      const gameDay = getGameDayString(); // Uses 5am ET reset
+      const { timezone, resetHour } = await getTimeSettings();
+      const gameDay = getGameDayString(timezone, resetHour);
       const dailyKey = `leaderboard:daily:${gameDay}`;
       const weeklyKey = `leaderboard:weekly`;
       const allTimeKey = `leaderboard:alltime`;
@@ -247,9 +260,24 @@ router.post<unknown, SubmitScoreResponse, SubmitScoreRequest>(
   }
 );
 
+// API endpoint to get timezone settings for client
+router.get('/api/settings/time', async (_req, res): Promise<void> => {
+  try {
+    const timeSettings = await getTimeSettings();
+    res.json(timeSettings);
+  } catch (error) {
+    console.error('Error fetching time settings:', error);
+    res.status(500).json({
+      timezone: 'America/New_York',
+      resetHour: 5,
+    });
+  }
+});
+
 router.get<unknown, LeaderboardResponse>('/api/leaderboard/daily', async (_req, res): Promise<void> => {
   try {
-    const gameDay = getGameDayString(); // Uses 5am ET reset
+    const { timezone, resetHour } = await getTimeSettings();
+    const gameDay = getGameDayString(timezone, resetHour);
     const dailyKey = `leaderboard:daily:${gameDay}`;
 
     console.log('[Leaderboard Fetch] Fetching daily leaderboard');
@@ -369,6 +397,50 @@ router.post('/internal/scheduler/daily-post', async (_req, res): Promise<void> =
   console.log(`[Scheduler] Subreddit: ${context.subredditName}`);
 
   try {
+    // Get auto-posting settings
+    const [enableAutoPosting, autoPostHour, timezone] = await Promise.all([
+      settings.get('enableAutoPosting'),
+      settings.get('autoPostHour'),
+      settings.get('timezone'),
+    ]);
+
+    const isAutoPostEnabled = enableAutoPosting !== false; // Default to true
+    const configuredHour = parseInt((autoPostHour as string) || '5', 10);
+    const tz = (timezone as string) || 'America/New_York';
+
+    console.log(`[Scheduler] Auto-posting enabled: ${isAutoPostEnabled}`);
+    console.log(`[Scheduler] Configured post hour: ${configuredHour} (${tz})`);
+
+    if (!isAutoPostEnabled) {
+      console.log(`[Scheduler] ⏭️ SKIPPED: Auto-posting is disabled for this subreddit`);
+      res.json({
+        status: 'skipped',
+        message: 'Auto-posting is disabled',
+      });
+      return;
+    }
+
+    // Check if current hour matches configured hour in the configured timezone
+    const now = new Date();
+    const formatter = new Intl.DateTimeFormat('en-US', {
+      timeZone: tz,
+      hour: '2-digit',
+      hour12: false,
+    });
+    const parts = formatter.formatToParts(now);
+    const currentHour = parseInt(parts.find(p => p.type === 'hour')?.value ?? '0');
+
+    console.log(`[Scheduler] Current hour in ${tz}: ${currentHour}`);
+
+    if (currentHour !== configuredHour) {
+      console.log(`[Scheduler] ⏭️ SKIPPED: Not the configured post time (current: ${currentHour}, configured: ${configuredHour})`);
+      res.json({
+        status: 'skipped',
+        message: `Not the configured post time (current: ${currentHour}, configured: ${configuredHour})`,
+      });
+      return;
+    }
+
     // Run as APP since scheduler has no user context
     const post = await createPost({ runAs: 'APP' });
 
@@ -386,6 +458,62 @@ router.post('/internal/scheduler/daily-post', async (_req, res): Promise<void> =
       message: 'Failed to create daily post',
       error: error instanceof Error ? error.message : String(error),
     });
+  }
+});
+
+// Subscribe to subreddit endpoint
+router.post('/api/subscribe', async (_req, res): Promise<void> => {
+  try {
+    const username = await reddit.getCurrentUsername();
+
+    if (!username) {
+      res.status(401).json({
+        success: false,
+        message: 'User not authenticated'
+      });
+      return;
+    }
+
+    // Subscribe the user to the current subreddit
+    await reddit.subscribeToCurrentSubreddit();
+
+    // Store subscription state in Redis
+    const subscriptionKey = `user:${username}:subscribed`;
+    await redis.set(subscriptionKey, 'true');
+
+    console.log(`[Subscribe] User ${username} subscribed to r/${context.subredditName}`);
+
+    res.json({
+      success: true,
+      message: `Subscribed to r/${context.subredditName}`
+    });
+  } catch (error) {
+    console.error('[Subscribe] Error subscribing user:', error);
+    res.status(500).json({
+      success: false,
+      message: 'Failed to subscribe'
+    });
+  }
+});
+
+// Check subscription status endpoint
+router.get('/api/subscribe/status', async (_req, res): Promise<void> => {
+  try {
+    const username = await reddit.getCurrentUsername();
+
+    if (!username) {
+      res.json({ isSubscribed: false });
+      return;
+    }
+
+    // Check Redis for subscription state
+    const subscriptionKey = `user:${username}:subscribed`;
+    const isSubscribed = await redis.get(subscriptionKey);
+
+    res.json({ isSubscribed: isSubscribed === 'true' });
+  } catch (error) {
+    console.error('[Subscribe] Error checking subscription status:', error);
+    res.json({ isSubscribed: false });
   }
 });
 
