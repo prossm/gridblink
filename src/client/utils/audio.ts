@@ -1,4 +1,4 @@
-// Audio system for Gridblink game
+// Audio system for gridblink game
 // Generates pentatonic scale tones for the 9 circles
 
 import { getGameDayOfYear } from '../../shared/utils/gameDay';

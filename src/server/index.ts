@@ -219,6 +219,15 @@ router.post<unknown, SubmitScoreResponse, SubmitScoreRequest>(
         await redis.set(userPersonalBestKey, score.toString());
       }
 
+      // Add user to the all-players sorted set (for statistics tracking)
+      // Using timestamp as score so we can see when they first played
+      const firstPlayKey = `user:${username}:first_play`;
+      const firstPlay = await redis.get(firstPlayKey);
+      if (!firstPlay) {
+        await redis.set(firstPlayKey, timestamp.toString());
+        await redis.zAdd('all_players', { member: username, score: timestamp });
+      }
+
       // Update all-time leaderboard
       // Get user's current all-time best
       const userAllTimeKey = `user:${username}:alltime`;
@@ -243,12 +252,9 @@ router.post<unknown, SubmitScoreResponse, SubmitScoreRequest>(
         const member = `${username}:${timestamp}`;
         await redis.zAdd(allTimeKey, { member, score });
 
-        // Keep only top 100 - remove entries beyond rank 100
-        const allTimeCount = await redis.zCard(allTimeKey);
-        if (allTimeCount > 100) {
-          // Remove lowest scores (remember: 0 is highest rank in ascending order)
-          await redis.zRemRangeByRank(allTimeKey, 0, allTimeCount - 101);
-        }
+        // Note: We no longer prune the all-time leaderboard here
+        // This preserves all historical data for statistics
+        // The display limit is handled in the GET endpoint
       }
 
       console.log(`[Leaderboard Submit] Success for ${username} with score ${score}`);
@@ -514,6 +520,68 @@ router.get('/api/subscribe/status', async (_req, res): Promise<void> => {
   } catch (error) {
     console.error('[Subscribe] Error checking subscription status:', error);
     res.json({ isSubscribed: false });
+  }
+});
+
+// Player statistics endpoint
+router.get('/api/stats/player-count', async (_req, res): Promise<void> => {
+  try {
+    let totalPlayers = await redis.zCard('all_players');
+
+    // If all_players is empty, initialize it from existing leaderboards
+    if (totalPlayers === 0) {
+      console.log('[Stats] Initializing all_players from existing data...');
+
+      // Get all unique usernames from all leaderboards
+      const uniqueUsernames = new Set<string>();
+      const timestamp = Date.now();
+
+      // Get all-time leaderboard (might be pruned to 100)
+      const allTimeKey = 'leaderboard:alltime';
+      const allTimeEntries = await redis.zRange(allTimeKey, 0, -1, { by: 'rank' });
+      for (const entry of allTimeEntries) {
+        const [username] = entry.member.split(':');
+        if (username) uniqueUsernames.add(username);
+      }
+
+      // Get weekly leaderboard
+      const weeklyKey = 'leaderboard:weekly';
+      const weeklyEntries = await redis.zRange(weeklyKey, 0, -1, { by: 'rank' });
+      for (const entry of weeklyEntries) {
+        const [username] = entry.member.split(':');
+        if (username) uniqueUsernames.add(username);
+      }
+
+      // Get daily leaderboard (current day)
+      const { timezone, resetHour } = await getTimeSettings();
+      const gameDay = getGameDayString(timezone, resetHour);
+      const dailyKey = `leaderboard:daily:${gameDay}`;
+      const dailyEntries = await redis.zRange(dailyKey, 0, -1, { by: 'rank' });
+      for (const entry of dailyEntries) {
+        const [username] = entry.member.split(':');
+        if (username) uniqueUsernames.add(username);
+      }
+
+      // Add all unique players to the all_players set
+      if (uniqueUsernames.size > 0) {
+        for (const username of uniqueUsernames) {
+          await redis.zAdd('all_players', { member: username, score: timestamp });
+        }
+        totalPlayers = uniqueUsernames.size;
+        console.log(`[Stats] Initialized all_players with ${totalPlayers} existing players`);
+      }
+    }
+
+    res.json({
+      totalPlayers,
+      description: 'Total unique players who have ever played the game',
+    });
+  } catch (error) {
+    console.error('[Stats] Error counting players:', error);
+    res.status(500).json({
+      totalPlayers: 0,
+      error: 'Failed to count players',
+    });
   }
 });
 

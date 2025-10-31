@@ -1,10 +1,10 @@
-# GridBlink
+# gridblink
 
 An oddly satisfying memory game.
 
 ## Overview
 
-GridBlink is an interactive memory game that challenges players to replicate sequences of musical tones. The computer plays a sequence of circles, each producing a distinct musical note, and players must tap the circles in the same order. With each successful round, the sequence grows longer and more challenging.
+gridblink is an interactive memory game that challenges players to replicate sequences of musical tones. The computer plays a sequence of circles, each producing a distinct musical note, and players must tap the circles in the same order. With each successful round, the sequence grows longer and more challenging.
 
 **Key Features:**
 - Configurable timezone and daily reset time for your community
@@ -18,26 +18,26 @@ GridBlink is an interactive memory game that challenges players to replicate seq
 
 1. Navigate to your subreddit's mod tools
 2. Go to the Apps section
-3. Search for "GridBlink" in the app directory
-4. Click "Install" to add GridBlink to your community
+3. Search for "gridblink" in the app directory
+4. Click "Install" to add gridblink to your community
 
-Upon installation, a game post will be created automatically. By default, GridBlink creates a new game post every day at 5am in your configured timezone, synchronized with the daily leaderboard reset.
+Upon installation, a game post will be created automatically. By default, gridblink creates a new game post every day at 5am in your configured timezone, synchronized with the daily leaderboard reset.
 
 ### Configuring Settings
 
-After installation, you can customize GridBlink for your community by accessing the app settings:
+After installation, you can customize gridblink for your community by accessing the app settings:
 
 **Timezone**: Select your community's timezone (defaults to US Eastern). This affects when the daily leaderboard resets and when musical scales rotate.
 
 **Daily Reset Time**: Choose what hour of day (in your timezone) the leaderboard resets and musical scales change (defaults to 5:00 AM).
 
-**Automatic Daily Posts**: Enable or disable automatic post creation (defaults to enabled). When enabled, GridBlink automatically creates a new game post each day.
+**Automatic Daily Posts**: Enable or disable automatic post creation (defaults to enabled). When enabled, gridblink automatically creates a new game post each day.
 
 **Automatic Post Time**: Choose what time (in your timezone) to automatically create new posts each day (defaults to 5:00 AM, matching the reset time).
 
 ### Manual Post Creation
 
-At any time, moderators can create a new GridBlink post manually by:
+At any time, moderators can create a new gridblink post manually by:
 1. Clicking the three-dot menu in the top-right of your subreddit
 2. Selecting "Create a new post"
 3. Choosing "gridblink" from the options
@@ -95,4 +95,4 @@ At any time, moderators can create a new GridBlink post manually by:
 
 ---
 
-*GridBlink is built on Reddit's Devvit platform, bringing interactive gaming experiences directly to your community.*
+*gridblink is built on Reddit's Devvit platform, bringing interactive gaming experiences directly to your community.*

@@ -83,7 +83,7 @@ export const Leaderboard = ({
             No scores yet. Be the first!
           </div>
         ) : (
-          entries.slice(0, 50).map((entry, index) => {
+          entries.slice(0, 100).map((entry, index) => {
             const isCurrentUser = entry.username === currentUsername;
             const rank = index + 1;
 
