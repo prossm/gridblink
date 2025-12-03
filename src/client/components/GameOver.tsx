@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState } from 'react';
 import { Leaderboard } from './Leaderboard';
 import { LeaderboardEntry, LeaderboardType } from '../types/game';
 
@@ -20,9 +20,12 @@ export const GameOver = ({
   allTimeLeaderboard,
 }: GameOverProps) => {
   const [leaderboardType, setLeaderboardType] = useState<LeaderboardType>('daily');
-  const [isSubscribed, setIsSubscribed] = useState(false);
-  const [isSubscribing, setIsSubscribing] = useState(false);
   const isChampion = score >= 200;
+
+  // Subscribe feature - Hidden until app is published and SUBSCRIBE_TO_SUBREDDIT permission is approved
+  // Uncomment after public launch when permission is granted
+  /* const [isSubscribed, setIsSubscribed] = useState(false);
+  const [isSubscribing, setIsSubscribing] = useState(false);
 
   // Check subscription status on mount
   useEffect(() => {
@@ -63,7 +66,7 @@ export const GameOver = ({
     } finally {
       setIsSubscribing(false);
     }
-  };
+  }; */
 
   return (
     <div className="flex flex-col items-center justify-start min-h-screen px-4 py-8 bg-gradient-to-br from-purple-50 to-blue-50 overflow-y-auto">
@@ -74,9 +77,7 @@ export const GameOver = ({
         </h1>
 
         {isChampion && (
-          <p className="text-xl text-purple-600 mb-4">
-            You reached the maximum sequence of 200!
-          </p>
+          <p className="text-xl text-purple-600 mb-4">You reached the maximum sequence of 200!</p>
         )}
 
         <div className="text-center mb-4">

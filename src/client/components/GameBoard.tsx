@@ -28,9 +28,7 @@ export const GameBoard = ({
       {personalBest > 0 && (
         <div className="absolute top-4 left-4 text-left">
           <p className="text-xs text-gray-500 mb-0.5">Personal Best</p>
-          <p className="text-2xl font-bold text-gray-700">
-            {personalBest}
-          </p>
+          <p className="text-2xl font-bold text-gray-700">{personalBest}</p>
         </div>
       )}
 
@@ -81,7 +79,7 @@ export const GameBoard = ({
           style={{
             boxShadow: isPlayerTurn
               ? '0 10px 15px -3px rgba(34, 197, 94, 0.3), 0 4px 6px -4px rgba(34, 197, 94, 0.3)'
-              : '0 10px 15px -3px rgba(234, 179, 8, 0.3), 0 4px 6px -4px rgba(234, 179, 8, 0.3)'
+              : '0 10px 15px -3px rgba(234, 179, 8, 0.3), 0 4px 6px -4px rgba(234, 179, 8, 0.3)',
           }}
         >
           <p className="text-lg font-bold flex items-center gap-2">

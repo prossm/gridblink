@@ -40,7 +40,7 @@ export const useGame = ({ initialPersonalBest = 0 }: UseGameProps = {}) => {
 
   // Start game
   const startGame = useCallback(() => {
-    initAudio();
+    void initAudio();
     setGameState('computer-turn');
     setScore(0);
     setSequence([]);
@@ -50,42 +50,45 @@ export const useGame = ({ initialPersonalBest = 0 }: UseGameProps = {}) => {
   }, []);
 
   // Play computer sequence
-  const playComputerSequence = useCallback(async (seq: number[], currentScore: number, speed: GameSpeed) => {
-    console.log('[Game] Computer turn starting, sequence length:', seq.length);
-    setGameState('computer-turn');
-    setPlayerSequence([]);
+  const playComputerSequence = useCallback(
+    async (seq: number[], currentScore: number, speed: GameSpeed) => {
+      console.log('[Game] Computer turn starting, sequence length:', seq.length);
+      setGameState('computer-turn');
+      setPlayerSequence([]);
 
-    // Speed up after round 5, then apply game speed multiplier
-    const roundSpeedMultiplier = currentScore >= 5 ? 0.75 : 1;
-    const adjustedFlashDuration = (BASE_FLASH_DURATION * roundSpeedMultiplier) / speed;
-    const adjustedFlashGap = (BASE_FLASH_GAP * roundSpeedMultiplier) / speed;
+      // Speed up after round 5, then apply game speed multiplier
+      const roundSpeedMultiplier = currentScore >= 5 ? 0.75 : 1;
+      const adjustedFlashDuration = (BASE_FLASH_DURATION * roundSpeedMultiplier) / speed;
+      const adjustedFlashGap = (BASE_FLASH_GAP * roundSpeedMultiplier) / speed;
 
-    for (let i = 0; i < seq.length; i++) {
-      const circleIndex = seq[i];
-      if (circleIndex !== undefined) {
-        await new Promise((resolve) => setTimeout(resolve, adjustedFlashGap));
-        setFlashingCircle(circleIndex);
-        playTone(circleIndex);
-        await new Promise((resolve) => setTimeout(resolve, adjustedFlashDuration));
-        setFlashingCircle(null);
+      for (let i = 0; i < seq.length; i++) {
+        const circleIndex = seq[i];
+        if (circleIndex !== undefined) {
+          await new Promise((resolve) => setTimeout(resolve, adjustedFlashGap));
+          setFlashingCircle(circleIndex);
+          playTone(circleIndex);
+          await new Promise((resolve) => setTimeout(resolve, adjustedFlashDuration));
+          setFlashingCircle(null);
+        }
       }
-    }
 
-    // Add small delay before enabling player input to ensure last flash completes
-    await new Promise((resolve) => setTimeout(resolve, 100));
+      // Add small delay before enabling player input to ensure last flash completes
+      await new Promise((resolve) => setTimeout(resolve, 100));
 
-    // Start player turn
-    console.log('[Game] Player turn starting - circles should be clickable now');
-    setGameState('player-turn');
-    lastInputTimeRef.current = Date.now();
+      // Start player turn
+      console.log('[Game] Player turn starting - circles should be clickable now');
+      setGameState('player-turn');
+      lastInputTimeRef.current = Date.now();
 
-    // Set timeout for player inactivity
-    playerTimeoutRef.current = setTimeout(() => {
-      console.log('[Game] Player timeout - no input received');
-      playGameOverSound();
-      setGameState('game-over');
-    }, PLAYER_TIMEOUT);
-  }, []);
+      // Set timeout for player inactivity
+      playerTimeoutRef.current = setTimeout(() => {
+        console.log('[Game] Player timeout - no input received');
+        playGameOverSound();
+        setGameState('game-over');
+      }, PLAYER_TIMEOUT);
+    },
+    []
+  );
 
   // Handle player click
   const handleCircleClick = useCallback(

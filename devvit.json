@@ -3,9 +3,7 @@
   "name": "gridblink",
   "permissions": {
     "reddit": {
-      "asUser": [
-        "SUBSCRIBE_TO_SUBREDDIT"
-      ]
+      "asUser": ["SUBSCRIBE_TO_SUBREDDIT"]
     }
   },
   "post": {

@@ -12,7 +12,8 @@ export const createPost = async (options?: { runAs?: 'USER' | 'APP' }) => {
       appDisplayName: 'gridblink',
       backgroundUri: 'splash-background.png',
       buttonLabel: 'Start Playing',
-      description: 'Watch, remember, repeat! Test your memory with circles and tones. How far can you go?',
+      description:
+        'Watch, remember, repeat! Test your memory with circles and tones. How far can you go?',
       heading: 'gridblink',
       appIconUri: 'app-icon.png',
     },

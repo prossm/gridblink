@@ -79,9 +79,7 @@ export const Leaderboard = ({
       {/* Leaderboard list */}
       <div className="bg-white rounded-lg shadow-lg overflow-hidden">
         {entries.length === 0 ? (
-          <div className="p-8 text-center text-gray-500">
-            No scores yet. Be the first!
-          </div>
+          <div className="p-8 text-center text-gray-500">No scores yet. Be the first!</div>
         ) : (
           entries.slice(0, 100).map((entry, index) => {
             const isCurrentUser = entry.username === currentUsername;
@@ -95,8 +93,8 @@ export const Leaderboard = ({
                   isCurrentUser
                     ? 'bg-gradient-to-r from-purple-100 to-blue-100 border-l-4 border-l-purple-500'
                     : rank <= 3
-                    ? 'bg-yellow-50'
-                    : ''
+                      ? 'bg-yellow-50'
+                      : ''
                 }`}
               >
                 <div className="flex items-center gap-3">
@@ -105,10 +103,10 @@ export const Leaderboard = ({
                       rank === 1
                         ? 'text-yellow-500'
                         : rank === 2
-                        ? 'text-gray-400'
-                        : rank === 3
-                        ? 'text-orange-600'
-                        : 'text-gray-600'
+                          ? 'text-gray-400'
+                          : rank === 3
+                            ? 'text-orange-600'
+                            : 'text-gray-600'
                     }`}
                   >
                     {rank === 1 ? '🥇' : rank === 2 ? '🥈' : rank === 3 ? '🥉' : `#${rank}`}
@@ -121,7 +119,9 @@ export const Leaderboard = ({
                     {entry.username}
                   </span>
                 </div>
-                <span className={`text-xl font-bold ${isCurrentUser ? 'text-purple-700' : 'text-gray-700'}`}>
+                <span
+                  className={`text-xl font-bold ${isCurrentUser ? 'text-purple-700' : 'text-gray-700'}`}
+                >
                   {entry.score}
                 </span>
               </div>

@@ -174,7 +174,9 @@ router.post<unknown, SubmitScoreResponse, SubmitScoreRequest>(
 
         // Remove old daily entries for this user
         const dailyEntries = await redis.zRange(dailyKey, 0, -1, { by: 'rank' });
-        const oldDailyMembers = dailyEntries.filter(e => e.member.startsWith(`${username}:`)).map(e => e.member);
+        const oldDailyMembers = dailyEntries
+          .filter((e) => e.member.startsWith(`${username}:`))
+          .map((e) => e.member);
 
         if (oldDailyMembers.length > 0) {
           await redis.zRem(dailyKey, oldDailyMembers);
@@ -197,8 +199,8 @@ router.post<unknown, SubmitScoreResponse, SubmitScoreRequest>(
         // Remove old weekly entries for this user from the sorted set
         const allWeeklyEntries = await redis.zRange(weeklyKey, 0, -1, { by: 'rank' });
         const oldWeeklyMembers = allWeeklyEntries
-          .filter(e => e.member.startsWith(`${username}:`))
-          .map(e => e.member);
+          .filter((e) => e.member.startsWith(`${username}:`))
+          .map((e) => e.member);
 
         if (oldWeeklyMembers.length > 0) {
           await redis.zRem(weeklyKey, oldWeeklyMembers);
@@ -241,8 +243,8 @@ router.post<unknown, SubmitScoreResponse, SubmitScoreRequest>(
         // Remove old all-time entries for this user
         const allTimeEntries = await redis.zRange(allTimeKey, 0, -1, { by: 'rank' });
         const oldAllTimeMembers = allTimeEntries
-          .filter(e => e.member.startsWith(`${username}:`))
-          .map(e => e.member);
+          .filter((e) => e.member.startsWith(`${username}:`))
+          .map((e) => e.member);
 
         if (oldAllTimeMembers.length > 0) {
           await redis.zRem(allTimeKey, oldAllTimeMembers);
@@ -280,89 +282,98 @@ router.get('/api/settings/time', async (_req, res): Promise<void> => {
   }
 });
 
-router.get<unknown, LeaderboardResponse>('/api/leaderboard/daily', async (_req, res): Promise<void> => {
-  try {
-    const { timezone, resetHour } = await getTimeSettings();
-    const gameDay = getGameDayString(timezone, resetHour);
-    const dailyKey = `leaderboard:daily:${gameDay}`;
+router.get<unknown, LeaderboardResponse>(
+  '/api/leaderboard/daily',
+  async (_req, res): Promise<void> => {
+    try {
+      const { timezone, resetHour } = await getTimeSettings();
+      const gameDay = getGameDayString(timezone, resetHour);
+      const dailyKey = `leaderboard:daily:${gameDay}`;
 
-    console.log('[Leaderboard Fetch] Fetching daily leaderboard');
-    // Get top scores in descending order
-    const results = await redis.zRange(dailyKey, 0, 99, { by: 'rank', reverse: true });
+      console.log('[Leaderboard Fetch] Fetching daily leaderboard');
+      // Get top scores in descending order
+      const results = await redis.zRange(dailyKey, 0, 99, { by: 'rank', reverse: true });
 
-    const entries: LeaderboardEntry[] = results.map((item) => {
-      const [username, timestampStr] = item.member.split(':');
-      return {
-        username: username || 'anonymous',
-        score: item.score,
-        timestamp: parseInt(timestampStr || '0'),
-      };
-    });
+      const entries: LeaderboardEntry[] = results.map((item) => {
+        const [username, timestampStr] = item.member.split(':');
+        return {
+          username: username || 'anonymous',
+          score: item.score,
+          timestamp: parseInt(timestampStr || '0'),
+        };
+      });
 
-    console.log(`[Leaderboard Fetch] Daily entries: ${entries.length}`);
-    res.json({ entries });
-  } catch (error) {
-    console.error('Error fetching daily leaderboard:', error);
-    res.status(500).json({ entries: [] });
-  }
-});
-
-router.get<unknown, LeaderboardResponse>('/api/leaderboard/weekly', async (_req, res): Promise<void> => {
-  try {
-    const weeklyKey = `leaderboard:weekly`;
-    const sevenDaysAgo = Date.now() - 7 * 24 * 60 * 60 * 1000;
-
-    // Remove old entries (older than 7 days)
-    const allEntries = await redis.zRange(weeklyKey, 0, -1, { by: 'rank' });
-    for (const item of allEntries) {
-      const [, timestampStr] = item.member.split(':');
-      const timestamp = parseInt(timestampStr || '0');
-      if (timestamp < sevenDaysAgo) {
-        await redis.zRem(weeklyKey, [item.member]);
-      }
+      console.log(`[Leaderboard Fetch] Daily entries: ${entries.length}`);
+      res.json({ entries });
+    } catch (error) {
+      console.error('Error fetching daily leaderboard:', error);
+      res.status(500).json({ entries: [] });
     }
-
-    // Get top scores
-    const results = await redis.zRange(weeklyKey, 0, 99, { by: 'rank', reverse: true });
-
-    const entries: LeaderboardEntry[] = results.map((item) => {
-      const [username, timestampStr] = item.member.split(':');
-      return {
-        username: username || 'anonymous',
-        score: item.score,
-        timestamp: parseInt(timestampStr || '0'),
-      };
-    });
-
-    res.json({ entries });
-  } catch (error) {
-    console.error('Error fetching weekly leaderboard:', error);
-    res.status(500).json({ entries: [] });
   }
-});
+);
 
-router.get<unknown, LeaderboardResponse>('/api/leaderboard/alltime', async (_req, res): Promise<void> => {
-  try {
-    const allTimeKey = `leaderboard:alltime`;
+router.get<unknown, LeaderboardResponse>(
+  '/api/leaderboard/weekly',
+  async (_req, res): Promise<void> => {
+    try {
+      const weeklyKey = `leaderboard:weekly`;
+      const sevenDaysAgo = Date.now() - 7 * 24 * 60 * 60 * 1000;
 
-    // Get top 100 scores in descending order
-    const results = await redis.zRange(allTimeKey, 0, 99, { by: 'rank', reverse: true });
+      // Remove old entries (older than 7 days)
+      const allEntries = await redis.zRange(weeklyKey, 0, -1, { by: 'rank' });
+      for (const item of allEntries) {
+        const [, timestampStr] = item.member.split(':');
+        const timestamp = parseInt(timestampStr || '0');
+        if (timestamp < sevenDaysAgo) {
+          await redis.zRem(weeklyKey, [item.member]);
+        }
+      }
 
-    const entries: LeaderboardEntry[] = results.map((item) => {
-      const [username, timestampStr] = item.member.split(':');
-      return {
-        username: username || 'anonymous',
-        score: item.score,
-        timestamp: parseInt(timestampStr || '0'),
-      };
-    });
+      // Get top scores
+      const results = await redis.zRange(weeklyKey, 0, 99, { by: 'rank', reverse: true });
 
-    res.json({ entries });
-  } catch (error) {
-    console.error('Error fetching all-time leaderboard:', error);
-    res.status(500).json({ entries: [] });
+      const entries: LeaderboardEntry[] = results.map((item) => {
+        const [username, timestampStr] = item.member.split(':');
+        return {
+          username: username || 'anonymous',
+          score: item.score,
+          timestamp: parseInt(timestampStr || '0'),
+        };
+      });
+
+      res.json({ entries });
+    } catch (error) {
+      console.error('Error fetching weekly leaderboard:', error);
+      res.status(500).json({ entries: [] });
+    }
   }
-});
+);
+
+router.get<unknown, LeaderboardResponse>(
+  '/api/leaderboard/alltime',
+  async (_req, res): Promise<void> => {
+    try {
+      const allTimeKey = `leaderboard:alltime`;
+
+      // Get top 100 scores in descending order
+      const results = await redis.zRange(allTimeKey, 0, 99, { by: 'rank', reverse: true });
+
+      const entries: LeaderboardEntry[] = results.map((item) => {
+        const [username, timestampStr] = item.member.split(':');
+        return {
+          username: username || 'anonymous',
+          score: item.score,
+          timestamp: parseInt(timestampStr || '0'),
+        };
+      });
+
+      res.json({ entries });
+    } catch (error) {
+      console.error('Error fetching all-time leaderboard:', error);
+      res.status(500).json({ entries: [] });
+    }
+  }
+);
 
 router.post('/internal/on-app-install', async (_req, res): Promise<void> => {
   try {
@@ -434,12 +445,14 @@ router.post('/internal/scheduler/daily-post', async (_req, res): Promise<void> =
       hour12: false,
     });
     const parts = formatter.formatToParts(now);
-    const currentHour = parseInt(parts.find(p => p.type === 'hour')?.value ?? '0');
+    const currentHour = parseInt(parts.find((p) => p.type === 'hour')?.value ?? '0');
 
     console.log(`[Scheduler] Current hour in ${tz}: ${currentHour}`);
 
     if (currentHour !== configuredHour) {
-      console.log(`[Scheduler] ⏭️ SKIPPED: Not the configured post time (current: ${currentHour}, configured: ${configuredHour})`);
+      console.log(
+        `[Scheduler] ⏭️ SKIPPED: Not the configured post time (current: ${currentHour}, configured: ${configuredHour})`
+      );
       res.json({
         status: 'skipped',
         message: `Not the configured post time (current: ${currentHour}, configured: ${configuredHour})`,
@@ -475,7 +488,7 @@ router.post('/api/subscribe', async (_req, res): Promise<void> => {
     if (!username) {
       res.status(401).json({
         success: false,
-        message: 'User not authenticated'
+        message: 'User not authenticated',
       });
       return;
     }
@@ -491,13 +504,13 @@ router.post('/api/subscribe', async (_req, res): Promise<void> => {
 
     res.json({
       success: true,
-      message: `Subscribed to r/${context.subredditName}`
+      message: `Subscribed to r/${context.subredditName}`,
     });
   } catch (error) {
     console.error('[Subscribe] Error subscribing user:', error);
     res.status(500).json({
       success: false,
-      message: 'Failed to subscribe'
+      message: 'Failed to subscribe',
     });
   }
 });

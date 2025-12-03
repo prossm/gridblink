@@ -130,22 +130,15 @@ export const Circle = ({ index, isFlashing, onClick, disabled }: CircleProps) =>
     <button
       className="relative flex items-center justify-center aspect-square w-full rounded-full focus:outline-none cursor-pointer touch-manipulation overflow-hidden"
       style={{
-        backgroundColor: isFlashing
-          ? color.dark
-          : isInverted
-            ? invertedColor
-            : color.base,
-        transform: isFlashing
-          ? 'scale(0.95)'
-          : isPressed
-            ? 'scale(0.92)'
-            : 'scale(1)',
+        backgroundColor: isFlashing ? color.dark : isInverted ? invertedColor : color.base,
+        transform: isFlashing ? 'scale(0.95)' : isPressed ? 'scale(0.92)' : 'scale(1)',
         boxShadow: isFlashing
           ? `0 0 35px ${color.bright}, 0 0 15px ${color.dark}, inset 0 0 20px rgba(0,0,0,0.2)`
           : isPressed
             ? `inset 0 2px 8px rgba(0,0,0,0.3)`
             : 'none',
-        transition: 'transform 0.05s cubic-bezier(0.4, 0, 0.2, 1), box-shadow 0.05s cubic-bezier(0.4, 0, 0.2, 1), background-color 0.15s cubic-bezier(0.4, 0, 0.2, 1)',
+        transition:
+          'transform 0.05s cubic-bezier(0.4, 0, 0.2, 1), box-shadow 0.05s cubic-bezier(0.4, 0, 0.2, 1), background-color 0.15s cubic-bezier(0.4, 0, 0.2, 1)',
         willChange: 'transform, background-color, box-shadow',
         cursor: disabled ? 'not-allowed' : 'pointer',
         touchAction: 'manipulation',
@@ -169,7 +162,8 @@ export const Circle = ({ index, isFlashing, onClick, disabled }: CircleProps) =>
           opacity: haloScale > 0 ? 0.9 - haloScale * 0.7 : 0,
           border: `4px solid ${color.bright}`,
           boxShadow: `0 0 25px ${color.bright}`,
-          transition: 'transform 0.4s cubic-bezier(0.4, 0, 0.2, 1), opacity 0.4s cubic-bezier(0.4, 0, 0.2, 1)',
+          transition:
+            'transform 0.4s cubic-bezier(0.4, 0, 0.2, 1), opacity 0.4s cubic-bezier(0.4, 0, 0.2, 1)',
           willChange: 'transform, opacity',
         }}
       />

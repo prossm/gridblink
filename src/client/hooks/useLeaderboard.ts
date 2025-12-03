@@ -91,7 +91,11 @@ export const useLeaderboard = (_username: string, score: number, gameOver: boole
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({ score: finalScore }),
         });
-        console.log('[Leaderboard] Submit response status:', response.status, response.ok ? 'OK' : 'FAILED');
+        console.log(
+          '[Leaderboard] Submit response status:',
+          response.status,
+          response.ok ? 'OK' : 'FAILED'
+        );
 
         if (!response.ok) {
           const errorText = await response.text();

@@ -31,9 +31,7 @@ export const IntroScreen = ({ onStart, gameSpeed, onGameSpeedChange }: IntroScre
           gridblink
         </h1>
 
-        <p className="text-xl text-center text-gray-800 font-semibold -mt-4">
-          Test your memory!
-        </p>
+        <p className="text-xl text-center text-gray-800 font-semibold -mt-4">Test your memory!</p>
 
         <div className="flex flex-col gap-4 text-base text-gray-700 w-full">
           <div className="flex items-start gap-3">
@@ -63,9 +61,7 @@ export const IntroScreen = ({ onStart, gameSpeed, onGameSpeedChange }: IntroScre
 
         {/* Game Speed Selector */}
         <div className="mt-4 mb-12 flex items-center gap-3">
-          <label className="text-sm font-semibold text-gray-700">
-            Game Speed:
-          </label>
+          <label className="text-sm font-semibold text-gray-700">Game Speed:</label>
           <div className="relative" ref={dropdownRef}>
             <button
               onClick={() => setIsSpeedDropdownOpen(!isSpeedDropdownOpen)}

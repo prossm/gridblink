@@ -54,7 +54,7 @@ export const useCounter = () => {
           count: data.count,
           username: data.username,
           personalBest: data.personalBest,
-          loading: false
+          loading: false,
         });
         setPostId(data.postId);
 

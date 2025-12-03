@@ -7,6 +7,7 @@ An oddly satisfying memory game.
 gridblink is an interactive memory game that challenges players to replicate sequences of musical tones. The computer plays a sequence of circles, each producing a distinct musical note, and players must tap the circles in the same order. With each successful round, the sequence grows longer and more challenging.
 
 **Key Features:**
+
 - Configurable timezone and daily reset time for your community
 - Daily rotating musical scales synchronized with leaderboard resets
 - Adjustable game speed to match your skill level
@@ -38,6 +39,7 @@ After installation, you can customize gridblink for your community by accessing 
 ### Manual Post Creation
 
 At any time, moderators can create a new gridblink post manually by:
+
 1. Clicking the three-dot menu in the top-right of your subreddit
 2. Selecting "Create a new post"
 3. Choosing "gridblink" from the options
@@ -51,6 +53,7 @@ At any time, moderators can create a new gridblink post manually by:
 5. One incorrect tap ends the game and displays your score on the leaderboard
 
 **Tips for Success:**
+
 - Listen to the musical tones - each circle has a distinct note
 - Start with slower speeds while learning the game
 - Use both visual and audio memory to remember patterns
@@ -71,12 +74,14 @@ At any time, moderators can create a new gridblink post manually by:
 ### Version 0.0.2.1 (Current)
 
 **Latest (Timezone & Settings Update):**
+
 - Added configurable timezone support for global communities
 - Moderators can now set custom daily reset times
 - Configurable automatic post timing with enable/disable option
 - Musical scales now rotate based on configured timezone and reset time
 
-### Version 0.0.1.304 - October 17, 2024 - UX Improvements:**
+### Version 0.0.1.304 - October 17, 2024 - UX Improvements:\*\*
+
 - Smoother tap animations with cubic-bezier easing and performance optimizations
 - Added color inversion and ripple effects for delightful tap interactions
 - Fixed rapid click handling - animations now properly interrupt and restart
@@ -86,7 +91,8 @@ At any time, moderators can create a new gridblink post manually by:
 - Fixed mobile circle layout stretching issue
 - Improved edge click detection on circles
 
-### Version 0.0.1.1 - October 15, 2024 - Initial Release:**
+### Version 0.0.1.1 - October 15, 2024 - Initial Release:\*\*
+
 - Musical memory game with increasing difficulty
 - Daily leaderboard system
 - Rotating pentatonic musical scales
@@ -95,4 +101,4 @@ At any time, moderators can create a new gridblink post manually by:
 
 ---
 
-*gridblink is built on Reddit's Devvit platform, bringing interactive gaming experiences directly to your community.*
+_gridblink is built on Reddit's Devvit platform, bringing interactive gaming experiences directly to your community._

@@ -32,10 +32,10 @@ export const getGameDayString = (
   });
 
   const parts = formatter.formatToParts(now);
-  const tzYear = parseInt(parts.find(p => p.type === 'year')?.value ?? '0');
-  const tzMonth = parseInt(parts.find(p => p.type === 'month')?.value ?? '0');
-  const tzDay = parseInt(parts.find(p => p.type === 'day')?.value ?? '0');
-  const tzHour = parseInt(parts.find(p => p.type === 'hour')?.value ?? '0');
+  const tzYear = parseInt(parts.find((p) => p.type === 'year')?.value ?? '0');
+  const tzMonth = parseInt(parts.find((p) => p.type === 'month')?.value ?? '0');
+  const tzDay = parseInt(parts.find((p) => p.type === 'day')?.value ?? '0');
+  const tzHour = parseInt(parts.find((p) => p.type === 'hour')?.value ?? '0');
 
   // If it's before the reset hour, use the previous day
   let gameDay: Date;

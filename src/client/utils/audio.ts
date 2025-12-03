@@ -3,7 +3,13 @@
 
 import { getGameDayOfYear } from '../../shared/utils/gameDay';
 
-const audioContext = typeof window !== 'undefined' ? new (window.AudioContext || (window as unknown as { webkitAudioContext: typeof AudioContext }).webkitAudioContext)() : null;
+const audioContext =
+  typeof window !== 'undefined'
+    ? new (
+        window.AudioContext ||
+        (window as unknown as { webkitAudioContext: typeof AudioContext }).webkitAudioContext
+      )()
+    : null;
 
 // Pentatonic scale notes (frequencies in Hz)
 // Using C major pentatonic: C, D, E, G, A plus upper C, D, E, G
@@ -13,8 +19,8 @@ const getPentatonicFrequencies = (dayOfYear: number): number[] => {
     261.63, // C4
     293.66, // D4
     329.63, // E4
-    392.00, // G4
-    440.00, // A4
+    392.0, // G4
+    440.0, // A4
     523.25, // C5
     587.33, // D5
     659.25, // E5
@@ -23,10 +29,7 @@ const getPentatonicFrequencies = (dayOfYear: number): number[] => {
 
   // Rotate scale based on day of year for variety
   const rotation = dayOfYear % 5;
-  return [
-    ...baseFrequencies.slice(rotation),
-    ...baseFrequencies.slice(0, rotation)
-  ].slice(0, 9);
+  return [...baseFrequencies.slice(rotation), ...baseFrequencies.slice(0, rotation)].slice(0, 9);
 };
 
 let currentFrequencies: number[] = [];

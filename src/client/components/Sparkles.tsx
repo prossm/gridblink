@@ -25,8 +25,10 @@ export const Sparkles = ({ show }: SparklesProps) => {
       // Generate more sparkles with greater variety and staggered timing
       const animationTypes: Array<'float' | 'spin' | 'twinkle'> = ['float', 'spin', 'twinkle'];
       const newSparkles: Sparkle[] = Array.from({ length: 30 }, (_, i) => {
-        const color1 = SPARKLE_COLORS[Math.floor(Math.random() * SPARKLE_COLORS.length)] || '#FFD700';
-        const color2 = SPARKLE_COLORS[Math.floor(Math.random() * SPARKLE_COLORS.length)] || '#FF6B9D';
+        const color1 =
+          SPARKLE_COLORS[Math.floor(Math.random() * SPARKLE_COLORS.length)] || '#FFD700';
+        const color2 =
+          SPARKLE_COLORS[Math.floor(Math.random() * SPARKLE_COLORS.length)] || '#FF6B9D';
         return {
           id: Date.now() + i,
           x: Math.random() * 100,
@@ -36,7 +38,8 @@ export const Sparkles = ({ show }: SparklesProps) => {
           size: 3 + Math.random() * 7, // Bigger size range
           delay: Math.random() * 0.5, // Longer stagger window
           duration: 0.6 + Math.random() * 0.6, // Vary duration 0.6-1.2s
-          animationType: animationTypes[Math.floor(Math.random() * animationTypes.length)] || 'float',
+          animationType:
+            animationTypes[Math.floor(Math.random() * animationTypes.length)] || 'float',
         };
       });
       setSparkles(newSparkles);
@@ -56,9 +59,11 @@ export const Sparkles = ({ show }: SparklesProps) => {
     <div className="absolute inset-0 pointer-events-none overflow-visible">
       {sparkles.map((sparkle) => {
         const animClass =
-          sparkle.animationType === 'float' ? 'animate-sparkle-float' :
-          sparkle.animationType === 'spin' ? 'animate-sparkle-spin' :
-          'animate-sparkle-twinkle';
+          sparkle.animationType === 'float'
+            ? 'animate-sparkle-float'
+            : sparkle.animationType === 'spin'
+              ? 'animate-sparkle-spin'
+              : 'animate-sparkle-twinkle';
 
         return (
           <div

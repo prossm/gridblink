@@ -27,7 +27,9 @@ export const App = () => {
   );
 
   if (gameState === 'intro') {
-    return <IntroScreen onStart={startGame} gameSpeed={gameSpeed} onGameSpeedChange={setGameSpeed} />;
+    return (
+      <IntroScreen onStart={startGame} gameSpeed={gameSpeed} onGameSpeedChange={setGameSpeed} />
+    );
   }
 
   if (gameState === 'game-over') {
